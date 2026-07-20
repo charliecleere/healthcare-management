@@ -1,0 +1,22 @@
+#pragma once
+
+// Libraries needed
+#include <iostream>
+#include <cstdlib>
+#include <cctype>
+#include <string>
+
+class Date
+{
+	friend std::ostream& operator<<(std::ostream& output, Date d);
+
+public:
+	Date(int = 0, int = 0, int = 0);
+	~Date();
+	void setDate(int m, int d, int y);
+
+private:
+	int month;
+	int day;
+	int year;
+};
