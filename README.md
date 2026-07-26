@@ -30,14 +30,25 @@ This project began as a CSCN 112 course project and was independently completed,
 
 ## Build and Run
 
-Requirements: CMake 3.20+ and a C++17 compiler. Visual Studio 2022 Community/MSVC is the primary Windows toolchain.
+Requirements: CMake 3.20+ and a C++17 compiler. Visual Studio 2022 Community/MSVC is the primary Windows toolchain, and Ninja is the easiest option for VS Code use.
 
 ```powershell
-cmake -S . -B build -G "Visual Studio 17 2022" -A x64
-cmake --build build --config Debug
-ctest --test-dir build -C Debug --output-on-failure
-.\build\Debug\healthcare_management.exe
+cmake --preset ninja-debug
+cmake --build --preset ninja-debug
+ctest --preset ninja-debug --output-on-failure
+.\build\ninja-debug\healthcare_management.exe
 ```
+
+For Visual Studio 2022, you can also use the `vs2022-debug` preset:
+
+```powershell
+cmake --preset vs2022-debug
+cmake --build --preset vs2022-debug
+ctest --preset vs2022-debug --output-on-failure
+.\build\vs2022-debug\Debug\healthcare_management.exe
+```
+
+In VS Code, open the folder and use the Run button or press `F5`. If VS Code asks you to choose a preset, select `ninja-debug`.
 
 The build automatically copies the included fictional `.txt` data files beside the executable. To import a sample patient, choose **Read patient information from file** and enter a filename such as `Demo Patient Aurora` without the `.txt` extension.
 
