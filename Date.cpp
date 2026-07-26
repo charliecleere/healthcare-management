@@ -1,6 +1,6 @@
 #include "Date.h"
 
-std::ostream& operator<<(std::ostream& output, Date d)
+std::ostream& operator<<(std::ostream& output, const Date& d)
 {
 	output << std::to_string(d.month) + "/" + std::to_string(d.day) + "/" + std::to_string(d.year);
 	return output;

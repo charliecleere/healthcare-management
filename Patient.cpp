@@ -1,5 +1,8 @@
 #include "Patient.h"
 
+#include <algorithm>
+#include <cctype>
+
 // Multi-argument constructor with default parameters
 Patient::Patient(int i, std::string fn, std::string ln, std::string sa, int a, double h, double w, char g, bool ia, CaseManager cm)
 {
@@ -159,7 +162,7 @@ std::ostream& operator<<(std::ostream& out, const Patient& patient)
 	out << std::setw(12) << "" << std::left << std::setw(26) << "Age:" << patient.getAge() << std::endl;
 	out << std::setw(12) << "" << std::left << std::setw(26) << "Height:" << patient.getHeight() << std::endl;
 	out << std::setw(12) << "" << std::left << std::setw(26) << "Weight:" << patient.getWeight() << std::endl;
-	(toupper(patient.getGender() == 'M')) ? (display_gender = "Male") : (display_gender = "Female");
+	(toupper(static_cast<unsigned char>(patient.getGender())) == 'M') ? (display_gender = "Male") : (display_gender = "Female");
 	out << std::setw(12) << "" << std::left << std::setw(26) << "Gender:" << display_gender << std::endl;
 	out << std::endl;
 	// Translates the bool variable into the correct text that it should output
@@ -185,7 +188,7 @@ std::ostream& operator<<(std::ostream& out, const Patient& patient)
 	if (patient.visits.size() > 0)
 	{
 		out << std::setw(19) << "" << "Visit Information" << std::endl << std::endl;
-		for (int j = 0; j < patient.visits.size(); j++)
+		for (std::size_t j = 0; j < patient.visits.size(); j++)
 		{
 			patient.visits[j].printVisit(out);
 		}
@@ -235,7 +238,7 @@ int Patient::getSingleBpm(int index) const
 {
 	int temp_bpm = 0;
 
-	if (index < 0 || index >= bpms.size())
+	if (index < 0 || static_cast<std::size_t>(index) >= bpms.size())
 		temp_bpm = -1;
 	else
 		temp_bpm = bpms[index];
@@ -244,26 +247,13 @@ int Patient::getSingleBpm(int index) const
 
 int Patient::getBpmCount() const
 {
-	return bpms.size();
+	return static_cast<int>(bpms.size());
 }
 
 // Bubble sort to sort the bpms vector in my class
 void Patient::sortBpms()
 {
-	int temp_bpm;
-
-	for (int j = 1; j < bpms.size(); j++)
-	{
-		for (int i = 0; i < bpms.size() - j; i++)
-		{
-			if (bpms.at(i) > bpms.at(i + 1))
-			{
-				temp_bpm = bpms.at(i);
-				bpms.at(i) = bpms.at(i + 1);
-				bpms.at(i + 1) = temp_bpm;
-			}
-		}
-	}
+	std::sort(bpms.begin(), bpms.end());
 }
 
 // Returns back the smallest bpm in the bpms vector
@@ -273,8 +263,8 @@ int Patient::findMinBpm() const
 
 	if (bpms.size() != 0)
 	{
-		int minIndex = 0;
-		for (int i = 1; i < bpms.size(); i++)
+		std::size_t minIndex = 0;
+		for (std::size_t i = 1; i < bpms.size(); i++)
 			if (bpms[minIndex] > bpms[i])
 				minIndex = i;
 
@@ -292,8 +282,8 @@ int Patient::findMaxBpm() const
 
 	if (bpms.size() != 0)
 	{
-		int maxIndex = 0;
-		for (int i = 1; i < bpms.size(); i++)
+		std::size_t maxIndex = 0;
+		for (std::size_t i = 1; i < bpms.size(); i++)
 			if (bpms[maxIndex] < bpms[i])
 				maxIndex = i;
 
@@ -308,16 +298,16 @@ int Patient::findMaxBpm() const
 // Returns the average bpm of the bpms vector
 double Patient::calculateAvgBpm() const
 {
-	int temp_avg_bpm = 0;
+	double temp_avg_bpm = 0.0;
 
 	if (bpms.size() != 0)
 	{
 		int sum = 0;
 
-		for (int i = 0; i < bpms.size(); i++)
+		for (std::size_t i = 0; i < bpms.size(); i++)
 			sum = sum + bpms[i];
 
-		temp_avg_bpm = static_cast<double>(sum) / bpms.size();
+		temp_avg_bpm = static_cast<double>(sum) / static_cast<double>(bpms.size());
 	}
 	else
 		temp_avg_bpm = -1;
@@ -333,14 +323,24 @@ void Patient::addVisit(Visit v)
 Visit Patient::getVisit(int index) const
 {
 	Visit temp_visit;
-	if (index < 0 || index >= visits.size())
+	if (index < 0 || static_cast<std::size_t>(index) >= visits.size())
 		temp_visit = Visit();
 	else
 		temp_visit = visits[index];
 	return temp_visit;
 }
 
-int Patient::getNumOfVisits() const
+int Patient::getNumVisits() const
 {
-	return visits.size();
+	return static_cast<int>(visits.size());
+}
+
+bool Patient::hasVisitId(int visit_id) const
+{
+	for (const Visit& visit : visits)
+	{
+		if (visit.getId() == visit_id)
+			return true;
+	}
+	return false;
 }

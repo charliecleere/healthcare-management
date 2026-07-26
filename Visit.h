@@ -31,7 +31,7 @@ public:
 	void addService(Service s);
 	void printVisit(std::ostream& out) const;
 
-	void tokenizeDate(char* c, int& month, int& day, int& year);
+	void tokenizeDate(const char* c, int& month, int& day, int& year) const;
 
 private:
 	int id;

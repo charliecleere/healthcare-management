@@ -1,87 +1,8 @@
-/*
-	Lab 7: Polymorphism and Operator Overloading
-	Charlie Cleere
-	4/24/2026
-*/
-
-/*
-	ALGORITHM
-
-	In Patient Header File:
-	1a. Include everything from Lab 2
-
-	1b. Include an include statement for the visit class header file
-
-	2. Add vector of visit objects
-
-	3. Add a addVisit function
-
-	4. Modify the printPatientDetails function to include data from the visits vector
-
-
-	In Patient Implementation File:
-	1. Include everything from Lab 2
-
-	2. Add a addVisit function
-
-	3. Modify the printPatientDetails function to include data from the visits vector
-
-
-	In Service Header File:
-	1. Include serviceID, and seviceName as private member variables
-
-	2. For public member variables include a two-argument constructor with default parameters, destructor, and accessor/mutator functions
-
-
-	In Service Implementation File:
-	1. Constructor, destructor, and access/mutator functions
-
-
-	In Visit Header File:
-	1a. Include an include statement for the service class header file
-
-	1b. Include visitID, employeeName, visitDate, and vector of services as private member variables
-
-	2. Include three-argument constructor with default parameters, destructor, accessor/mutator functions, add service function, printVisit function for private member variables. (You may not need the printVisit function, and it may be in private variables.)
-
-
-	In Visit Implementation File:
-	1. Include three-argument constructor with default parameters, destructor, accessor/mutator functions, add service function, printVisit function (You may not need the printVisit function, and it may be in private variables.)
-
-
-	In Main and Other Non-Class Functions File (includes only new content that adds on top of Lab 2):
-	1a. Before main create a global const variable that stores the name of the services text file
-
-	1b. Put any new function prototypes before main
-
-	2. Inside main declare in the local variables a vector of services
-
-	3. Implement a loadServicesOffered function, and pass in the vector of services by reference
-
-	4. Modify the switch to include the 4th option of the menu, i.e., the create visit for patient option
-
-	5. If user selects option 4:
-		+ Implement a createVisitForPatient function (passign in ....)
-			+ Prompt the user for the ID of the patient to assign the new visit
-			+ Error check similar to how I did it in the deleteExistingPatient function (I may not need this, and I also may not need this in the deleteExistingPatient function)
-			+ Implement a search function (also, use this function in other areas in your code: in the deleteExistingPatient function, and maybe later in this function)
-				+ This function will return the position (or index) of one of the vector objects that has the same ID that I passed into the function. If it is not found return -1.
-			+ Prompt for the details of the visit (i.e. the VisitID, the nurse/aide’s name, and the date of the visit). Store in 3 temp variables
-			+ The visit object should then be created with three parameters (for the constructor)
-			+ Using the vector of services print to the console a list of all the services and their corresponding ID number
-			+ Get from the user their service ID of choice
-			+ I think use the same search function as above to find the index of the service they want to add. If no object matches the ID then give error message and allow the user to re-enter the ID or exit the screen
-			+ Once a valid ID is entered, call the addService function, passing in an object of the vector of services with the index of their chosen object
-			+ Call the addVisit function passing in the visit object
-
-	6. For if the user chooses option 5 or 6, modify the printPatientDetails function to include the visit info.
-		+ Maybe use the printVisit function in the visit class to help with this
-
-*/
-
 #include <fstream>
 #include <random>
 #include <algorithm>
+#include <cctype>
+#include <limits>
 #include <typeinfo>
 #include "Patient.h"
 #include "Nurse.h"
@@ -111,7 +32,7 @@ const int SCREEN_WIDTH = 64;
 void loadServicesFromFile(vector<Service>& services, bool& files_are_open);
 
 template <typename T>
-void loadEmployeeData(T**& employees, string file_name, bool& files_are_open);
+void loadEmployeeData(T**& employees, const string& file_name, bool& files_are_open);
 
 void loadEquipmentData(vector<Equipment*>& equipment, bool& files_are_open);
 
@@ -132,22 +53,22 @@ Patient readPatientFromFile(const vector<Patient>& patients);
 
 void deleteExistingPatient(vector<Patient>& patients);
 
-void showPatientList(vector<Patient> patients);
+void showPatientList(const vector<Patient>& patients);
 
-void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of_nurses, Aide** aides, int num_of_aides, vector<Service> services);
+void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of_nurses, Aide** aides, int num_of_aides, const vector<Service>& services);
 
 template <typename T>
-int searchForIdInVector(vector<T> vector, int id_to_find);
+int searchForIdInVector(const vector<T>& values, int id_to_find);
 
-int searchForIdInEquipmentVector(vector<Equipment*> equipment, int id_to_find);
+int searchForIdInEquipmentVector(const vector<Equipment*>& equipment, int id_to_find);
 
-int searchForIdInVisitVector(Patient patient, int id_to_find);
+int searchForIdInVisitVector(const Patient& patient, int id_to_find);
 
 template <typename T>
 int searchForIdInDynArray(T** array, int array_size, int id_to_find);
 
 template <typename T>
-int getEmployeeIdChoice(T** employees, int num_of_employees, string emp_type_title, string assignment_target);
+int getEmployeeIdChoice(T** employees, int num_of_employees, const string& emp_type_title, const string& assignment_target);
 
 void assignCaseManagerToPatient(vector<Patient>& patients, CaseManager** case_managers, int num_of_case_managers);
 
@@ -157,19 +78,22 @@ void sortPatientById(vector<Patient>& patients);
 
 void printEmployeeReport(ostream& out, Nurse** nurses, int num_of_nurses, Aide** aides, int num_of_aides, CaseManager** case_managers, int num_of_case_managers);
 
-void showEquipmentList(vector<Equipment*> equipment);
+void showEquipmentList(const vector<Equipment*>& equipment);
 
-int getAndSearchForEquipmentId(vector<Equipment*> equipment, std::string prompt);
+int getAndSearchForEquipmentId(const vector<Equipment*>& equipment, const std::string& prompt);
 
-int calculateCenteredTextX(std::string s);
+int calculateCenteredTextX(const std::string& s);
+
+void waitForEnter();
 
 template <typename T>
 void updateStorageUnitInformation(T& storage_unit);
 
 int promptForStorageUnitType();
 
-template <typename T>
-void addEquipmentToStorageUnit(T storage_unit, vector<Equipment*> equipment);
+void addEquipmentToStorageUnit(StorageUnit<MonitorEquipment>& monitor_equipment_unit,
+	StorageUnit<MobilityEquipment>& mobility_equipment_unit,
+	const vector<Equipment*>& equipment);
 
 int main()
 {
@@ -190,7 +114,6 @@ int main()
 	int equipment_menu_choice = 0;
 	ofstream output_file;
 	string output_file_name;
-	int equipment_id_choice = 0;
 	StorageUnit<MonitorEquipment> monitor_equipment_unit;
 	StorageUnit<MobilityEquipment> mobility_equipment_unit;
 	int unit_type_choice = 0;
@@ -291,7 +214,7 @@ int main()
 						// Sorts the patients vector by patient ID number
 						sortPatientById(patients);
 						// Prints to the screen all the patient objects that have been loaded into the array
-						for (int i = 0; i < patients.size(); i++)
+						for (size_t i = 0; i < patients.size(); i++)
 						{
 							patients[i].sortBpms();
 							cout << patients[i];
@@ -316,7 +239,7 @@ int main()
 						output_file.open(output_file_name + ".txt");
 
 						// Prints to a file all the patient objects that have been loaded into the array
-						for (int i = 0; i < patients.size(); i++)
+						for (size_t i = 0; i < patients.size(); i++)
 						{
 							patients[i].sortBpms();
 							output_file << patients[i];
@@ -339,7 +262,7 @@ int main()
 						break;
 					}
 					if (patient_menu_choice != 9)
-						system("pause");
+						waitForEnter();
 				} while (patient_menu_choice != 9);
 				break;
 			case 2: // Employee management option from main menu
@@ -350,7 +273,7 @@ int main()
 					switch (employee_menu_choice)
 					{
 					case 1: // Print employee report to screen option from employee submenu
-						printEmployeeReport(cout, nurses, num_of_nurses, aides, num_of_nurses, case_managers, num_of_case_managers);
+						printEmployeeReport(cout, nurses, num_of_nurses, aides, num_of_aides, case_managers, num_of_case_managers);
 						break;
 					case 2: // Return to main menu option from employee submenu
 						break;
@@ -359,7 +282,7 @@ int main()
 						break;
 					}
 					if (employee_menu_choice != 2)
-						system("pause");
+						waitForEnter();
 				} while (employee_menu_choice != 2);
 				break;
 			case 3: // Equipment management option from main menu
@@ -374,20 +297,20 @@ int main()
 						break;
 					case 2: // Produce depreciation schedule for equipment option from equipment submenu
 						showEquipmentList(equipment);
-						equipment[getAndSearchForEquipmentId(equipment, "Enter the ID of the equipment you want to see the depreciation schedule for: ")]->depreciation(cout);
+						equipment[getAndSearchForEquipmentId(equipment, "Enter the ID of the equipment you want to see the depreciation schedule for: ")]->depreciate(cout);
 						break;
 					case 3: // Update storage unit information option from the equipment submenu
 						unit_type_choice = promptForStorageUnitType();
 						
 						switch (unit_type_choice)
 						{
-						case 1: // Update monitor equipment storage unit information
-							updateStorageUnitInformation(monitor_equipment_unit);
-							break;
-						case 2: // Update mobility equipment storage unit information
+						case 1: // Update mobility equipment storage unit information
 							updateStorageUnitInformation(mobility_equipment_unit);
 							break;
-						case 3: // Exit
+						case 2: // Update monitor equipment storage unit information
+							updateStorageUnitInformation(monitor_equipment_unit);
+							break;
+						case 0: // Exit
 							break;
 						default:
 							cout << "Error. Invalid menu choice. Please try again." << endl;
@@ -396,21 +319,22 @@ int main()
 						break;
 					case 4: // Add equipment to storage unit
 						showEquipmentList(equipment);
-						addEquipmentToStorageUnit(monitor_equipment_unit, equipment);
+						addEquipmentToStorageUnit(monitor_equipment_unit, mobility_equipment_unit, equipment);
+						break;
 					case 5: // View storage unit information
 						unit_type_choice = promptForStorageUnitType();
 
 						switch (unit_type_choice)
 						{
-						case 1: // View monitor equipment storage unit information
-							monitor_equipment_unit.printUnitInformation();
-							monitor_equipment_unit.printInventory("Monitor");
-							break;
-						case 2: // View mobility equipment storage unit information
+						case 1: // View mobility equipment storage unit information
 							mobility_equipment_unit.printUnitInformation();
 							mobility_equipment_unit.printInventory("Mobility");
 							break;
-						case 3: // Exit
+						case 2: // View monitor equipment storage unit information
+							monitor_equipment_unit.printUnitInformation();
+							monitor_equipment_unit.printInventory("Monitor");
+							break;
+						case 0: // Exit
 							break;
 						default:
 							cout << "Error. Invalid menu choice. Please try again." << endl;
@@ -424,7 +348,7 @@ int main()
 						break;
 					}
 					if (equipment_menu_choice != 6)
-						system("pause");
+						waitForEnter();
 				} while (equipment_menu_choice != 6);
 				break;
 			case 4: // Exit option from main menu
@@ -435,7 +359,6 @@ int main()
 				cout << "Error. Invalid menu choice. Please try again." << endl;
 				break;
 			}
-			system("pause");
 		} while (main_menu_choice != 4);
 
 		// Deallocates memory
@@ -463,7 +386,7 @@ int main()
 		delete[] case_managers;
 		case_managers = nullptr;
 
-		for (int i = 0; i < equipment.size(); i++)
+		for (size_t i = 0; i < equipment.size(); i++)
 		{
 			delete equipment[i];
 			equipment[i] = nullptr;
@@ -472,7 +395,7 @@ int main()
 	else
 	{
 		cout << endl;
-		system("pause");
+		waitForEnter();
 	}
 
 	return 0;
@@ -484,7 +407,6 @@ int main()
 void loadServicesFromFile(vector<Service>& services, bool& files_are_open)
 {
 	ifstream input_file;
-	string input_file_name = "";
 	int temp_service_id = 0;
 	string temp_service_name = "";
 
@@ -497,16 +419,11 @@ void loadServicesFromFile(vector<Service>& services, bool& files_are_open)
 	}
 	else
 	{
-		// While it's not the end of the file do the following
-		while (!input_file.eof())
+		while (input_file >> temp_service_id)
 		{
-			input_file >> temp_service_id;
 			input_file.ignore(numeric_limits<streamsize>::max(), '\n');
 			getline(input_file, temp_service_name);
-
-			Service temp_service(temp_service_id, temp_service_name);
-
-			services.push_back(temp_service);
+			services.emplace_back(temp_service_id, temp_service_name);
 		}
 	}
 	input_file.close();
@@ -514,7 +431,7 @@ void loadServicesFromFile(vector<Service>& services, bool& files_are_open)
 
 // Template function to load the three employee vectors (nurses, aides, and caseManagers) with employees and their information from a file
 template <typename T>
-void loadEmployeeData(T** &employees, string file_name, bool& files_are_open)
+void loadEmployeeData(T** &employees, const string& file_name, bool& files_are_open)
 {
 	ifstream input_file;
 	int temp_employee_id = 0;
@@ -533,20 +450,17 @@ void loadEmployeeData(T** &employees, string file_name, bool& files_are_open)
 	}
 	else
 	{
-		// While it's not the end of the file do the following
-		while (!input_file.eof())
+		while (input_file >> temp_employee_id)
 		{
-			input_file >> temp_employee_id;
 			input_file.ignore(numeric_limits<streamsize>::max(), '\n');
 			getline(input_file, temp_emp_first_name);
 			getline(input_file, temp_emp_last_name);
-			input_file >> temp_earnings;
+			if (!(input_file >> temp_earnings))
+				break;
 			input_file.ignore(numeric_limits<streamsize>::max(), '\n');
 			getline(input_file, temp_credentials);
 
-			employees[i] = new T(temp_employee_id, temp_emp_first_name, temp_emp_last_name, temp_earnings, temp_credentials);
-
-			i++;
+			employees[i++] = new T(temp_employee_id, temp_emp_first_name, temp_emp_last_name, temp_earnings, temp_credentials);
 		}
 	}
 	input_file.close();
@@ -564,8 +478,6 @@ void loadEquipmentData(vector<Equipment*>& equipment, bool& files_are_open)
 	double temp_salvage_value = 0.0;
 	string temp_type_or_mode = "";
 	
-	int i = 0;  // To keep track of the index as the while loop goes through the array
-
 	input_file.open(EQUIPMENT_FILE_NAME + ".txt");
 
 	if (!input_file)
@@ -575,28 +487,24 @@ void loadEquipmentData(vector<Equipment*>& equipment, bool& files_are_open)
 	}
 	else
 	{
-		// While it's not the end of the file do the following
-		while (!input_file.eof())
+		while (input_file >> temp_equipment_id)
 		{
-			input_file >> temp_equipment_id;
 			input_file.ignore(numeric_limits<streamsize>::max(), '\n');
 			getline(input_file, temp_equipment_name);
-			input_file >> temp_purchase_date;
-			input_file >> temp_original_cost;
-			input_file >> temp_useful_life;
-			input_file >> temp_salvage_value;
+			if (!(input_file >> temp_purchase_date >> temp_original_cost >> temp_useful_life >> temp_salvage_value))
+				break;
 			input_file.ignore(numeric_limits<streamsize>::max(), '\n');
 			getline(input_file, temp_type_or_mode);
 
+			Equipment* item = nullptr;
 			if (temp_useful_life <= 5)
-				equipment.push_back(new MonitorEquipment(temp_equipment_id, temp_equipment_name, temp_original_cost, temp_useful_life, temp_salvage_value, temp_type_or_mode));
-			else if (temp_useful_life > 5)
-				equipment.push_back(new MobilityEquipment(temp_equipment_id, temp_equipment_name, temp_original_cost, temp_useful_life, temp_salvage_value, temp_type_or_mode));
+				item = new MonitorEquipment(temp_equipment_id, temp_equipment_name, temp_original_cost, temp_useful_life, temp_salvage_value, temp_type_or_mode);
+			else
+				item = new MobilityEquipment(temp_equipment_id, temp_equipment_name, temp_original_cost, temp_useful_life, temp_salvage_value, temp_type_or_mode);
 
-			equipment[i]->tokenizeDate(temp_purchase_date, m, d, y);
-			equipment[i]->setPurchaseDate(m, d, y);
-
-			i++;
+			item->tokenizeDate(temp_purchase_date, m, d, y);
+			item->setPurchaseDate(m, d, y);
+			equipment.push_back(item);
 		}
 	}
 	input_file.close();
@@ -772,11 +680,10 @@ Patient buildPatientFromUserInput(const vector<Patient>& patients)  // I pass in
 	int num_of_bpm_readings = 0;
 	int temp_bpm_reading = 0;
 
-	while (searchForIdInVector(patients, randomNum(num)) != -1)
-		randomNum(num);
-
-	// Store random number between 1 and 100 in temp patient ID variable
-	temp_patient_id = randomNum(num);
+	do
+	{
+		temp_patient_id = static_cast<int>(randomNum(num));
+	} while (searchForIdInVector(patients, temp_patient_id) != -1);
 	temp_patient.setId(temp_patient_id);
 
 	cout << "First name: ";
@@ -847,7 +754,7 @@ Patient buildPatientFromUserInput(const vector<Patient>& patients)  // I pass in
 		cout << "Gender (M or F): ";
 		cin >> temp_gender;
 	}
-	temp_patient.setGender(toupper(temp_gender));
+	temp_patient.setGender(static_cast<char>(toupper(static_cast<unsigned char>(temp_gender))));
 
 	cout << "Is the patient ambulatory (Y or N): ";
 	cin >> temp_is_ambulatory;
@@ -863,7 +770,7 @@ Patient buildPatientFromUserInput(const vector<Patient>& patients)  // I pass in
 		temp_temp_is_ambulatory = true;
 	else
 		temp_temp_is_ambulatory = false;
-	temp_patient.setIsAmbulatory(toupper(temp_temp_is_ambulatory));
+	temp_patient.setIsAmbulatory(temp_temp_is_ambulatory);
 
 	// Prompt the user for the amount of bpm readings they will enter in, error check the value, and store it in a variable
 	cout << "How many heart rate (bpm) readings do you want to enter? ";
@@ -937,10 +844,10 @@ Patient readPatientFromFile(const vector<Patient>& patients)  // I pass in the p
 		input_file.open(input_file_name + ".txt");
 	}
 
-	while (searchForIdInVector(patients, randomNum(num)) != -1)
-		randomNum(num);
-
-	temp_patient_id = randomNum(num);
+	do
+	{
+		temp_patient_id = static_cast<int>(randomNum(num));
+	} while (searchForIdInVector(patients, temp_patient_id) != -1);
 	input_file >> temp_first_name;
 	input_file >> temp_last_name;
 	input_file.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -957,11 +864,8 @@ Patient readPatientFromFile(const vector<Patient>& patients)  // I pass in the p
 
 	Patient temp_patient(temp_patient_id, temp_first_name, temp_last_name, temp_street_address, temp_age, temp_height, temp_weight, temp_gender, temp_temp_is_ambulatory);
 
-	while (!input_file.eof())
-	{
-		input_file >> temp_bpm_reading;
+	while (input_file >> temp_bpm_reading)
 		temp_patient.addSingleBpm(temp_bpm_reading);
-	}
 
 	cout << endl << "Patient data loaded successfully." << endl << endl;
 
@@ -1019,27 +923,27 @@ void deleteExistingPatient(vector<Patient>& patients)
 		cout << endl << "Patient ID not found." << endl << endl;
 }
 
-void showPatientList(vector<Patient> patients)
+void showPatientList(const vector<Patient>& patients)
 {
-	sort(patients.begin(), patients.end());  // Sorts the patients vector by first name using the overloaded < operator in the Patient class
+	vector<Patient> sorted_patients = patients;
+	sort(sorted_patients.begin(), sorted_patients.end());  // Sorts the patients vector by first name using the overloaded < operator in the Patient class
 	cout << "The following patients are currently in the system:" << endl << endl;
 	cout << left << setw(7) << "ID" << "Patient Name" << endl;
 	cout << setfill('-') << setw(64) << "" << setfill(' ') << endl;
-	for (int i = 0; i < patients.size(); i++)
+	for (size_t i = 0; i < sorted_patients.size(); i++)
 	{
-		cout << left << setw(7) << patients[i].getId() << patients[i].getFirstName() << " " << patients[i].getLastName() << endl;
+		cout << left << setw(7) << sorted_patients[i].getId() << sorted_patients[i].getFirstName() << " " << sorted_patients[i].getLastName() << endl;
 	}
 	cout << endl;
 }
 
 // Function to add a visit (and it's information) to a patient of the user's choice
-void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of_nurses, Aide** aides, int num_of_aides, vector<Service> services)
+void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of_nurses, Aide** aides, int num_of_aides, const vector<Service>& services)
 {
 	int patient_id_to_add_visit_to = 0;
 	int patient_index_to_add_visit_to = 0;
 	Visit temp_visit;
 	int temp_visit_id = 0;
-	string temp_employee_name = "";
 	int m, d, y;
 	char temp_visit_date[20];
 	int service_id_to_add_to_visit = 0;
@@ -1048,8 +952,6 @@ void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of
 	int nurse_index_to_assign_to_visit = 0;
 	int aide_id_to_assign_to_visit = 0;
 	int aide_index_to_assign_to_visit = 0;
-	bool duplicate_id = false;
-	bool invalid_date = false;
 
 	showPatientList(patients);
 
@@ -1070,42 +972,38 @@ void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of
 
 	if (patient_index_to_add_visit_to != -1)
 	{
+		bool duplicate_id = false;
 		do
 		{
-			do
+			duplicate_id = false;
+			cout << "Enter the visit ID: ";
+			cin >> temp_visit_id;
+			if (cin.fail() || temp_visit_id < 0)
 			{
-				try
-				{
-					cout << "Enter the visit ID: ";
-					cin >> temp_visit_id;
-
-					// If it finds a duplicate ID, it does not return -1
-					if (searchForIdInVisitVector(patients[patient_index_to_add_visit_to], temp_visit_id) != -1)  // The Visit vector in patients[patient_index_to_add_visit_to] is what it's searching through
-						throw DuplicateIdException();
-				}
-				catch (string s)
-				{
-					duplicate_id = true;
-				}
-				catch (...)
-				{
-					cout << "An unexpected error occurred. Please try again." << endl;
-				}
-			} while (duplicate_id == true);
-
-			while (cin.fail())
-			{
-				cout << "Invalid ID. ID must be a number. Please try again." << endl;
+				cout << "Invalid ID. ID must be a non-negative number. Please try again." << endl;
 				cin.clear();
 				cin.ignore(numeric_limits<streamsize>::max(), '\n');
-				cout << "Enter the visit ID: ";
-				cin >> temp_visit_id;
+				duplicate_id = true;
+				continue;
 			}
-			temp_visit.setId(temp_visit_id);
-		} while (temp_visit.getId() == -1);
 
+			try
+			{
+				if (patients[patient_index_to_add_visit_to].hasVisitId(temp_visit_id))
+					throw DuplicateIdException();
+			}
+			catch (const DuplicateIdException& error)
+			{
+				cout << error.what() << " Please enter a different visit ID." << endl;
+				duplicate_id = true;
+			}
+		} while (duplicate_id);
+		temp_visit.setId(temp_visit_id);
+
+		bool invalid_date = false;
 		do
 		{
+			invalid_date = false;
 			try
 			{
 				cout << "Enter the date of the visit (MM/DD/YYYY): ";
@@ -1113,15 +1011,12 @@ void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of
 				temp_visit.tokenizeDate(temp_visit_date, m, d, y);
 				temp_visit.setDate(m, d, y);
 			}
-			catch (string s)
+			catch (const InvalidDateException& error)
 			{
+				cout << error.what() << " Please use MM/DD/YYYY." << endl;
 				invalid_date = true;
 			}
-			catch (...)
-			{
-				cout << "An unexpected error occurred. Please try again." << endl;
-			}
-		} while (invalid_date == true);
+		} while (invalid_date);
 
 		do
 		{
@@ -1166,7 +1061,7 @@ void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of
 			// Displays to the user the services offerered by HC0 and their corresponding ID numbers
 			cout << left << setw(7) << "ID" << "Service Name" << endl;
 			cout << setfill('-') << setw(64) << "" << setfill(' ') << endl;
-			for (auto i : services)
+			for (const auto& i : services)
 			{
 				cout << left << setw(7) << i.getId() << i.getName() << endl;
 			}
@@ -1206,68 +1101,35 @@ void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of
 
 // Template function to search an ID in a vector
 template <typename T>
-int searchForIdInVector(vector<T> vector, int id_to_find)
+int searchForIdInVector(const vector<T>& values, int id_to_find)
 {
-	bool id_is_found = false;
-	int i = 0;
-	int index_to_act_on = 0;
-
-	while (i < vector.size() && !id_is_found)
+	for (size_t i = 0; i < values.size(); ++i)
 	{
-		if (vector[i].getId() == id_to_find)
-			id_is_found = true;
-		else
-			i++;
+		if (values[i].getId() == id_to_find)
+			return static_cast<int>(i);
 	}
-
-	if (id_is_found)
-		index_to_act_on = i;
-	else
-		index_to_act_on = -1;
-
-	return index_to_act_on;
+	return -1;
 }
 
 // The equipment vector is a vector of pointers, so this is a separate function than the one above that searches for an ID in a vector of objects. This function searches for an ID in a vector of pointers to objects
-int searchForIdInEquipmentVector(vector<Equipment*> equipment, int id_to_find)
+int searchForIdInEquipmentVector(const vector<Equipment*>& equipment, int id_to_find)
 {
-	bool id_is_found = false;
-	int i = 0;
-	int index_to_act_on = 0;
-
-	while (i < equipment.size() && !id_is_found)
+	for (size_t i = 0; i < equipment.size(); ++i)
 	{
 		if (equipment[i]->getId() == id_to_find)
-			id_is_found = true;
-		else
-			i++;
+			return static_cast<int>(i);
 	}
-
-	if (id_is_found)
-		index_to_act_on = i;
-	else
-		index_to_act_on = -1;
-
-	return index_to_act_on;
+	return -1;
 }
 
-int searchForIdInVisitVector(Patient patient, int id_to_find)
+int searchForIdInVisitVector(const Patient& patient, int id_to_find)
 {
-	bool id_is_found = false;
-	int i = 0;
-	int index_to_act_on = 0;
-	while (i < patient.getNumOfVisits() && !id_is_found)
+	for (int i = 0; i < patient.getNumVisits(); ++i)
 	{
 		if (patient.getVisit(i).getId() == id_to_find)
-			id_is_found = true;
-		else
-			i++;
+			return i;
 	}
-	if (id_is_found)
-		index_to_act_on = i;
-	else
-		index_to_act_on = -1;
-	return index_to_act_on;
+	return -1;
 }
 
 // Template function to search an ID in a dynamic array
@@ -1296,7 +1158,7 @@ int searchForIdInDynArray(T** array, int array_size, int id_to_find)
 
 // Template function to display a vector of employees and their ID's and get the user choice 
 template <typename T>
-int getEmployeeIdChoice(T** employees, int num_of_employees, string emp_type_title, string assignment_target)
+int getEmployeeIdChoice(T** employees, int num_of_employees, const string& emp_type_title, const string& assignment_target)
 {
 	int id = 0;
 
@@ -1424,9 +1286,9 @@ void sortPatientById(vector<Patient>& patients)
 {
 	Patient temp_patient;
 
-	for (int j = 1; j < patients.size(); j++)
+	for (size_t j = 1; j < patients.size(); j++)
 	{
-		for (int i = 0; i < patients.size() - j; i++)
+		for (size_t i = 0; i < patients.size() - j; i++)
 		{
 			if (patients[i].getId() > patients[i + 1].getId())
 			{
@@ -1448,30 +1310,30 @@ void printEmployeeReport(ostream& out, Nurse** nurses, int num_of_nurses, Aide**
 	out << left << setw(5) << "ID" << setw(23) << "Employee Name" << setw(14) << "Hourly Wage" << "Designation" << endl;
 	out << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 	for (int i = 0; i < num_of_nurses; i++)
-		nurses[i]->printDetails(cout);
+		nurses[i]->printDetails(out);
 	out << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 	out << "AIDES" << endl;
 	out << std::setfill('-') << setw(64) << "-" << setfill(' ') << endl;
 	out << left << setw(5) << "ID" << setw(23) << "Employee Name" << setw(14) << "Hourly Wage" << "Certification" << endl;
 	out << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 	for (int i = 0; i < num_of_aides; i++)
-		aides[i]->printDetails(cout);
+		aides[i]->printDetails(out);
 	out << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 	out << "CASE MANAGERS" << endl;
 	out << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 	out << left << setw(5) << "ID" << setw(23) << "Employee Name" << setw(14) << "Salary" << "Degree" << endl;
 	out << std::setfill('-') << setw(64) << "" << setfill(' ') << endl;
 	for (int i = 0; i < num_of_case_managers; i++)
-		case_managers[i]->printDetails(cout);
+		case_managers[i]->printDetails(out);
 	out << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 	out << right << setw(24) << "" << "End of Report" << endl;
 	out << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 }
 
-void showEquipmentList(vector<Equipment*> equipment)
+void showEquipmentList(const vector<Equipment*>& equipment)
 {
-	// Sorts the equipment vector by equipment ID
-	sort(equipment.begin(), equipment.end(), [](Equipment* a, Equipment* b) { return *a < *b; });  // Uses lambda function
+	vector<Equipment*> sorted_equipment = equipment;
+	sort(sorted_equipment.begin(), sorted_equipment.end(), [](Equipment* a, Equipment* b) { return *a < *b; });  // Uses lambda function
 
 	cout << fixed << setprecision(2);
 	cout << setfill('-') << setw(100) << "" << setfill(' ') << endl;
@@ -1482,12 +1344,12 @@ void showEquipmentList(vector<Equipment*> equipment)
 	cout << setfill('-') << setw(100) << "" << setfill(' ') << endl << endl;
 	cout << left << setw(5) << "ID" << setw(25) << "Name" << setw(15) << "Purchase Date" << setw(15) << "Original Cost" << setw(14) << "Useful Life" << setw(15) << "Salvage Value" << "Type/Mode" << endl;
 	cout << setfill('-') << setw(100) << "" << setfill(' ') << endl;
-	for (int i = 0; i < equipment.size(); i++)
-		equipment[i]->printDetails(cout);
+	for (Equipment* item : sorted_equipment)
+		item->printDetails(cout);
 }
 
 // Returns the index of the equipment object in the vector that has the ID that the user inputs.
-int getAndSearchForEquipmentId(vector<Equipment*> equipment, std::string prompt)
+int getAndSearchForEquipmentId(const vector<Equipment*>& equipment, const std::string& prompt)
 {
 	int equipment_id = 0;
 	int index_of_equipment = 0;
@@ -1501,7 +1363,7 @@ int getAndSearchForEquipmentId(vector<Equipment*> equipment, std::string prompt)
 			cout << "Invalid ID. ID must be a non-negative number. Please try again." << endl;
 			cin.clear();
 			cin.ignore(numeric_limits<streamsize>::max(), '\n');
-			cout << endl << "Enter the ID of the equipment you want to see the depreciation schedule for: ";
+			cout << endl << prompt;
 			cin >> equipment_id;
 		}
 
@@ -1521,209 +1383,102 @@ int getAndSearchForEquipmentId(vector<Equipment*> equipment, std::string prompt)
 	return index_of_equipment;
 }
 
-int calculateCenteredTextX(std::string s)
+int calculateCenteredTextX(const std::string& s)
 {
-	return SCREEN_WIDTH / 2 + s.size() / 2;
+	return SCREEN_WIDTH / 2 + static_cast<int>(s.size()) / 2;
 }
 
-// Template function to update the information of a storage unit object. It is used in both the create new storage unit function and the update existing storage unit function since both of those functions need to get the same information from the user and store it in a storage unit object.
+void waitForEnter()
+{
+	if (cin.fail())
+		cin.clear();
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	cout << endl << "Press Enter to continue...";
+	cin.get();
+}
+
+template <typename Value, typename T>
+void promptAndSetStorageValue(T& storage_unit, const string& prompt, void (T::*setter)(Value))
+{
+	while (true)
+	{
+		Value value{};
+		cout << prompt;
+		cin >> value;
+		if (cin.fail())
+		{
+			cout << "The value entered was not a number. Please try again." << endl;
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			continue;
+		}
+
+		try
+		{
+			(storage_unit.*setter)(value);
+			return;
+		}
+		catch (const NegativeNumberException& error)
+		{
+			cout << error.what() << " Please try again." << endl;
+		}
+	}
+}
+
+char promptForYesNo(const string& prompt)
+{
+	char choice{};
+	while (true)
+	{
+		cout << prompt;
+		cin >> choice;
+		choice = static_cast<char>(toupper(static_cast<unsigned char>(choice)));
+		if (choice == 'Y' || choice == 'N')
+			return choice;
+
+		cout << "Invalid entry. Entry must be either Y or N. Please try again." << endl;
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	}
+}
+
 template <typename T>
 void updateStorageUnitInformation(T& storage_unit)
 {
-	int id = 0;
-	bool invalid_id = false;
-	string description = "";
-	int length = 0;
-	bool invalid_length = false;
-	int width = 0;
-	bool invalid_width = false;
-	int height = 0;
-	bool invalid_height = false;
-	double cost_per_month = 0.0;
-	bool invalid_cost_per_month = false;
 	char rented_date[20];
-	int m, d, y;
-	bool invalid_date = false;
-	bool temp_auto_renewal = ' ';
-	bool temp_humidity_controlled = ' ';
+	int month{};
+	int day{};
+	int year{};
+	string description;
 
-	do
-	{
-		try
-		{
-			cout << "Enter the ID of the storage unit: ";
-			cin >> id;
-			while (cin.fail())
-			{
-				cout << "Invalid ID. ID must be a number. Please try again." << endl;
-				cin.clear();
-				cin.ignore(numeric_limits<streamsize>::max(), '\n');
-				cout << "Enter the ID of the storage unit: ";
-				cin >> id;
-			}
-			storage_unit.setId(id);
-		}
-		catch (string s)
-		{
-			invalid_id = true;
-		}
-		catch (...)
-		{
-			cout << "Unhandled exception has been encountered." << endl;
-		}
-	} while (invalid_id == true);
-
+	promptAndSetStorageValue<int>(storage_unit, "Enter the ID of the storage unit: ", &T::setId);
 	cout << "Enter a description for the storage unit: ";
 	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	getline(cin, description);
 	storage_unit.setDescription(description);
+	promptAndSetStorageValue<int>(storage_unit, "Enter the length of the storage unit (in feet): ", &T::setLength);
+	promptAndSetStorageValue<int>(storage_unit, "Enter the width of the storage unit (in feet): ", &T::setWidth);
+	promptAndSetStorageValue<int>(storage_unit, "Enter the height of the storage unit (in feet): ", &T::setHeight);
+	promptAndSetStorageValue<double>(storage_unit, "Enter the cost per month to rent the storage unit: $", &T::setCostPerMonth);
 
-	do
-	{
-		try
-		{
-			cout << "Enter the length of the storage unit (in feet): ";
-			cin >> length;
-			while (cin.fail())
-			{
-				cout << "Invalid length. Length must be a number. Please try again." << endl;
-				cin.clear();
-				cin.ignore(numeric_limits<streamsize>::max(), '\n');
-				cout << "Enter the length of the storage unit (in feet): ";
-				cin >> length;
-			}
-			storage_unit.setLength(length);
-		}
-		catch (string s)
-		{
-			invalid_length = true;
-		}
-		catch (...)
-		{
-			cout << "Unhandled exception has been encountered." << endl;
-		}
-	} while (invalid_length == true);
-
-	do
-	{
-		try
-		{
-			cout << "Enter the width of the storage unit (in feet): ";
-			cin >> width;
-			while (cin.fail())
-			{
-				cout << "Invalid width. Width must be a number. Please try again." << endl;
-				cin.clear();
-				cin.ignore(numeric_limits<streamsize>::max(), '\n');
-				cout << "Enter the width of the storage unit (in feet): ";
-				cin >> width;
-			}
-			storage_unit.setWidth(width);
-		}
-		catch (string s)
-		{
-			invalid_width = true;
-		}
-		catch (...)
-		{
-			cout << "Unhandled exception has been encountered." << endl;
-		}
-	} while (invalid_width == true);
-
-	do
-	{
-		try
-		{
-			cout << "Enter the height of the storage unit (in feet): ";
-			cin >> height;
-			while (cin.fail())
-			{
-				cout << "Invalid height. Height must be a number. Please try again." << endl;
-				cin.clear();
-				cin.ignore(numeric_limits<streamsize>::max(), '\n');
-				cout << "Enter the height of the storage unit (in feet): ";
-				cin >> height;
-			}
-			storage_unit.setHeight(height);
-		}
-		catch (string s)
-		{
-			invalid_height = true;
-		}
-		catch (...)
-		{
-			cout << "Unhandled exception has been encountered." << endl;
-		}
-	} while (invalid_height == true);
-
-	do
-	{
-		try
-		{
-			cout << "Enter the cost per month to rent the storage unit: $";
-			cin >> cost_per_month;
-			while (cin.fail())
-			{
-				cout << "Invalid cost. Cost must be a number. Please try again." << endl;
-				cin.clear();
-				cin.ignore(numeric_limits<streamsize>::max(), '\n');
-				cout << "Enter the cost per month to rent the storage unit: $";
-				cin >> cost_per_month;
-			}
-			storage_unit.setCostPerMonth(cost_per_month);
-		}
-		catch (string s)
-		{
-			invalid_cost_per_month = true;
-		}
-		catch (...)
-		{
-			cout << "Unhandled exception has been encountered." << endl;
-		}
-	} while (invalid_cost_per_month == true);
-
-	do
+	while (true)
 	{
 		try
 		{
 			cout << "Enter the date rented (MM/DD/YYYY): ";
 			cin >> rented_date;
-			storage_unit.tokenizeDate(rented_date, m, d, y);
-			storage_unit.setDateRented(m, d, y);
+			storage_unit.tokenizeDate(rented_date, month, day, year);
+			storage_unit.setDateRented(month, day, year);
+			break;
 		}
-		catch (string s)
+		catch (const InvalidDateException& error)
 		{
-			invalid_date = true;
+			cout << error.what() << " Please use MM/DD/YYYY." << endl;
 		}
-		catch (...)
-		{
-			cout << "Unhandled exception has been encountered." << endl;
-		}
-	} while (invalid_date == true);
-
-	cout << "Does the rental have auto-renewal? (Y or N): ";
-	cin >> temp_auto_renewal;
-	while (toupper(temp_auto_renewal) != 'Y' && toupper(temp_auto_renewal) != 'N')
-	{
-		cout << "Invalid entry. Entry must be either Y or N. Please try again." << endl;
-		cin.clear();
-		cin.ignore(numeric_limits<streamsize>::max(), '\n');
-		cout << "Does the rental have auto-renewal? (Y or N): ";
-		cin >> temp_auto_renewal;
 	}
-	(toupper(temp_auto_renewal) == 'Y') ? storage_unit.setAutoRenewal(true) : storage_unit.setAutoRenewal(false);
 
-	cout << "Is the storage unit humidity-controlled? (Y or N): ";
-	cin >> temp_humidity_controlled;
-	while (toupper(temp_humidity_controlled) != 'Y' && toupper(temp_humidity_controlled) != 'N')
-	{
-		cout << "Invalid entry. Entry must be either Y or N. Please try again." << endl;
-		cin.clear();
-		cin.ignore(numeric_limits<streamsize>::max(), '\n');
-		cout << "Is the storage unit humidity-controlled? (Y or N): ";
-		cin >> temp_humidity_controlled;
-	}
-	(toupper(temp_humidity_controlled) == 'Y') ? storage_unit.setHumidityControlled(true) : storage_unit.setHumidityControlled(false);
+	storage_unit.setAutoRenewal(promptForYesNo("Does the rental have auto-renewal? (Y or N): ") == 'Y');
+	storage_unit.setHumidityControlled(promptForYesNo("Is the storage unit humidity-controlled? (Y or N): ") == 'Y');
 
 	cout << endl << endl << "Storage unit information updated successfully." << endl << endl;
 
@@ -1735,33 +1490,48 @@ void updateStorageUnitInformation(T& storage_unit)
 // Function to prompt the user to select a storage unit type. It returns the user's choice back to main.
 int promptForStorageUnitType()
 {
-	int num = -1;
-	
-	do
+	while (true)
 	{
+		int num = -1;
 		cout << "Enter 1 for the mobility storage unit, 2 for the monitoring storage unit, and 0 to exit: ";
 		cin >> num;
-	} while (cin.fail() || num < 0 || num > 2);
+		if (!cin.fail() && num >= 0 && num <= 2)
+			return num;
 
-	return num;
+		cout << "Invalid selection. Please enter 0, 1, or 2." << endl;
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	}
 }
 
-template <typename T>
-void addEquipmentToStorageUnit(T storage_unit, vector<Equipment*> equipment)
+void addEquipmentToStorageUnit(StorageUnit<MonitorEquipment>& monitor_equipment_unit,
+	StorageUnit<MobilityEquipment>& mobility_equipment_unit,
+	const vector<Equipment*>& equipment)
 {
-	int index_of_equipment = getAndSearchForEquipmentId(equipment, "Enter the ID of the equipment to assign to a storage unit ");  // Does the error checking for me. It loops until user gives valid ID.
-	
-	if (string(typeid(*equipment[index_of_equipment]).name()) == "class MobilityEquipment")
+	const int index_of_equipment = getAndSearchForEquipmentId(equipment, "Enter the ID of the equipment to assign to a storage unit: ");
+	Equipment* selected_equipment = equipment[static_cast<size_t>(index_of_equipment)];
+
+	if (monitor_equipment_unit.containsEquipmentId(selected_equipment->getId()) || mobility_equipment_unit.containsEquipmentId(selected_equipment->getId()))
 	{
-		MobilityEquipment* mobility_equipment_ptr = dynamic_cast<MobilityEquipment*>(equipment[index_of_equipment]);
-		// Had to comment this out because it was causing an error, and I was running out of time to submit:
-		//storage_unit.addEquipment(*mobility_equipment_ptr);
+		cout << "This item has already been added to a storage unit. Operation cancelled." << endl;
+		return;
 	}
-	else if (string(typeid(*equipment[index_of_equipment]).name()) == "class MonitorEquipment")
+
+	if (typeid(*selected_equipment) == typeid(MobilityEquipment))
 	{
-		MonitorEquipment* monitor_equipment_ptr = dynamic_cast<MonitorEquipment*>(equipment[index_of_equipment]);
-		// Had to comment this out because it was causing an error, and I was running out of time to submit:
-		//storage_unit.addEquipment(*monitor_equipment_ptr);
+		auto* mobility_equipment = dynamic_cast<MobilityEquipment*>(selected_equipment);
+		mobility_equipment_unit.addEquipment(*mobility_equipment);
+		cout << "Equipment successfully added to the mobility storage unit." << endl;
+		mobility_equipment_unit.printUnitInformation();
+		mobility_equipment_unit.printInventory("Mobility");
+	}
+	else if (typeid(*selected_equipment) == typeid(MonitorEquipment))
+	{
+		auto* monitor_equipment = dynamic_cast<MonitorEquipment*>(selected_equipment);
+		monitor_equipment_unit.addEquipment(*monitor_equipment);
+		cout << "Equipment successfully added to the monitoring storage unit." << endl;
+		monitor_equipment_unit.printUnitInformation();
+		monitor_equipment_unit.printInventory("Monitor");
 	}
 }
 

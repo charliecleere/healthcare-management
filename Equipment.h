@@ -27,12 +27,12 @@ public:
 	void setUsefulLife(int ul);
 	void setSalvageValue(double sv);
 
-	void tokenizeDate(char* c, int& month, int& day, int& year);
+	void tokenizeDate(const char* c, int& month, int& day, int& year);
 
-	int calculateCenteredTextX(std::string s) const;
+	int calculateCenteredTextX(const std::string& s) const;
 
 	// Pure virtual function to calculate depreciation, making Equipment an abstract class
-	virtual void depreciation(std::ostream& out) = 0; 
+	virtual void depreciate(std::ostream& out) const = 0;
 
 	// Pure virtual function to print equipment details, can be overridden by derived classes
 	virtual void printDetails(std::ostream& out) const = 0;

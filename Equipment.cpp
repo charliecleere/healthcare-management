@@ -1,5 +1,8 @@
 #include "Equipment.h"
 
+#include <cctype>
+#include <cstring>
+
 const int SCREEN_WIDTH = 64;
 
 Equipment::Equipment(int i, std::string n, double oc, int ul, double sv)
@@ -104,16 +107,17 @@ void Equipment::setSalvageValue(double sv)
 		salvage_value = sv;
 }
 // Function to tokenize the date
-void Equipment::tokenizeDate(char* dateStr, int& month, int& day, int& year)
+void Equipment::tokenizeDate(const char* dateStr, int& month, int& day, int& year)
 {
 	//ensure that the character array is in the correct format and parse out its month, day, and year
 	if (dateStr == nullptr || std::strlen(dateStr) == 0) throw InvalidDateException();
-	int len = std::strlen(dateStr);
+	const std::size_t len = std::strlen(dateStr);
 	if (len < 8 || len > 10) throw InvalidDateException();
 
 	// m/d/yyyy(8) to mm/dd/yyyy(10)
 	// Split string using manual parsing
-	int i{ 0 }, digitCount{ 0 };
+	std::size_t i{ 0 };
+	int digitCount{ 0 };
 
 	// Parse month
 	month = 0;
@@ -160,9 +164,9 @@ void Equipment::tokenizeDate(char* dateStr, int& month, int& day, int& year)
 } // End of tokenizeDate function
 
 // Function to calculate the value for setw that will center text
-int Equipment::calculateCenteredTextX(std::string s) const
+int Equipment::calculateCenteredTextX(const std::string& s) const
 {
-	return SCREEN_WIDTH / 2 + s.size() / 2;
+	return SCREEN_WIDTH / 2 + static_cast<int>(s.size()) / 2;
 }
 
 // Overloaded less-than operator to compare equipment by equipment ID for sorting

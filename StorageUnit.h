@@ -2,28 +2,32 @@
 
 #include "Date.h"
 #include "Equipment.h"
+#include "InvalidDateException.h"
 #include "NegativeNumberException.h"
-#include <vector>
+
 #include <algorithm>
+#include <cctype>
+#include <cstddef>
+#include <cstring>
 #include <iomanip>
 #include <iostream>
+#include <string>
+#include <vector>
 
-const int SCREEN_WIDTH_2 = 64;
+constexpr int STORAGE_UNIT_SCREEN_WIDTH = 64;
 
-// Class template definition for StorageUnit
+// A storage unit holds one concrete equipment type while sharing the same
+// rental and inventory behavior with every other unit.
 template <typename T>
 class StorageUnit
 {
 public:
-	// Constructor with default parameters
-	StorageUnit(int i = 0, std::string d = "", int l = 0, int w = 0, int h = 0, double cpm = 0.0, bool hc = false, bool ar = false);
-	
-	// Destructor
-	~StorageUnit();
+	StorageUnit(int i = 0, std::string d = "", int l = 0, int w = 0, int h = 0,
+		double cpm = 0.0, bool hc = false, bool ar = false);
+	~StorageUnit() = default;
 
-	// Accessor and mutator functions
 	void setId(int i);
-	void setDescription(std::string d);
+	void setDescription(const std::string& d);
 	void setLength(int l);
 	void setWidth(int w);
 	void setHeight(int h);
@@ -42,34 +46,29 @@ public:
 	bool getHumidityControlled() const;
 	bool getAutoRenewal() const;
 
-	// Other functions
-	void tokenizeDate(char* c, int& month, int& day, int& year);
-
-	// Had to comment this out because it was causing an error, and I was running out of time to submit:
-	/*template <typename T>
-	void addEquipment(T equipment);*/
-	
-	void printUnitInformation() const;
-
-	void printInventory(std::string equipment_type) const;
-
+	void tokenizeDate(const char* dateStr, int& month, int& day, int& year) const;
+	void addEquipment(const T& item);
+	bool containsEquipmentId(int equipmentId) const;
+	std::size_t getInventorySize() const;
 	void sortInventory();
+	void printUnitInformation() const;
+	void printInventory(const std::string& equipmentType) const;
 
-	int calculateCenteredTextX(std::string s) const;
 private:
-	int id;
+	int calculateCenteredTextX(const std::string& text) const;
+
+	int id{};
 	std::string description;
-	int length;
-	int width;
-	int height;
-	double cost_per_month;
-	Date date_rented;
-	bool humidity_controlled;
-	bool auto_renewal;
-	std::vector<T> equipment;
+	int length{};
+	int width{};
+	int height{};
+	double costPerMonth{};
+	Date dateRented;
+	bool humidityControlled{};
+	bool autoRenewal{};
+	std::vector<T> inventory;
 };
 
-// Function definitions for StorageUnit class template
 template <typename T>
 StorageUnit<T>::StorageUnit(int i, std::string d, int l, int w, int h, double cpm, bool hc, bool ar)
 {
@@ -84,22 +83,15 @@ StorageUnit<T>::StorageUnit(int i, std::string d, int l, int w, int h, double cp
 }
 
 template <typename T>
-StorageUnit<T>::~StorageUnit()
-{
-
-}
-
-template <typename T>
 void StorageUnit<T>::setId(int i)
 {
 	if (i < 0)
 		throw NegativeNumberException();
-	else
-		id = i;
+	id = i;
 }
 
 template <typename T>
-void StorageUnit<T>::setDescription(std::string d)
+void StorageUnit<T>::setDescription(const std::string& d)
 {
 	description = d;
 }
@@ -109,8 +101,7 @@ void StorageUnit<T>::setLength(int l)
 {
 	if (l < 0)
 		throw NegativeNumberException();
-	else
-		length = l;
+	length = l;
 }
 
 template <typename T>
@@ -118,8 +109,7 @@ void StorageUnit<T>::setWidth(int w)
 {
 	if (w < 0)
 		throw NegativeNumberException();
-	else
-		width = w;
+	width = w;
 }
 
 template <typename T>
@@ -127,8 +117,7 @@ void StorageUnit<T>::setHeight(int h)
 {
 	if (h < 0)
 		throw NegativeNumberException();
-	else
-		height = h;
+	height = h;
 }
 
 template <typename T>
@@ -136,26 +125,25 @@ void StorageUnit<T>::setCostPerMonth(double cpm)
 {
 	if (cpm < 0)
 		throw NegativeNumberException();
-	else
-		cost_per_month = cpm;
+	costPerMonth = cpm;
 }
 
 template <typename T>
 void StorageUnit<T>::setDateRented(int m, int d, int y)
 {
-	date_rented.setDate(m, d, y);
+	dateRented.setDate(m, d, y);
 }
 
 template <typename T>
 void StorageUnit<T>::setHumidityControlled(bool hc)
 {
-	humidity_controlled = hc;
+	humidityControlled = hc;
 }
 
 template <typename T>
 void StorageUnit<T>::setAutoRenewal(bool ar)
 {
-	auto_renewal = ar;
+	autoRenewal = ar;
 }
 
 template <typename T>
@@ -191,141 +179,144 @@ int StorageUnit<T>::getHeight() const
 template <typename T>
 double StorageUnit<T>::getCostPerMonth() const
 {
-	return cost_per_month;
+	return costPerMonth;
 }
 
 template <typename T>
 Date StorageUnit<T>::getDateRented() const
 {
-	return date_rented;
+	return dateRented;
 }
 
 template <typename T>
 bool StorageUnit<T>::getHumidityControlled() const
 {
-	return humidity_controlled;
-}	
+	return humidityControlled;
+}
 
 template <typename T>
 bool StorageUnit<T>::getAutoRenewal() const
 {
-	return auto_renewal;
+	return autoRenewal;
 }
 
 template <typename T>
-void StorageUnit<T>::tokenizeDate(char* dateStr, int& month, int& day, int& year)
+void StorageUnit<T>::tokenizeDate(const char* dateStr, int& month, int& day, int& year) const
 {
-	//ensure that the character array is in the correct format and parse out its month, day, and year
-	if (dateStr == nullptr || std::strlen(dateStr) == 0) throw InvalidDateException();
-	int len = std::strlen(dateStr);
-	if (len < 8 || len > 10) throw InvalidDateException();
+	if (dateStr == nullptr || std::strlen(dateStr) == 0)
+		throw InvalidDateException();
 
-	// m/d/yyyy(8) to mm/dd/yyyy(10)
-	// Split string using manual parsing
-	int i{ 0 }, digitCount{ 0 };
+	const std::size_t lengthOfDate = std::strlen(dateStr);
+	if (lengthOfDate < 8 || lengthOfDate > 10)
+		throw InvalidDateException();
 
-	// Parse month
+	std::size_t index = 0;
 	month = 0;
-	while (dateStr[i] != '/' && dateStr[i] != '\0') {
-		if (!isdigit(dateStr[i])) throw InvalidDateException();
-		month = month * 10 + (dateStr[i] - '0');
-		i++;
+	while (dateStr[index] != '/' && dateStr[index] != '\0')
+	{
+		if (!std::isdigit(static_cast<unsigned char>(dateStr[index])))
+			throw InvalidDateException();
+		month = month * 10 + (dateStr[index++] - '0');
 	}
-	if (dateStr[i] != '/') throw InvalidDateException();
-	i++; // Skip '/'
+	if (dateStr[index] != '/')
+		throw InvalidDateException();
 
-	// Parse day
+	++index;
 	day = 0;
-	while (dateStr[i] != '/' && dateStr[i] != '\0') {
-		if (!isdigit(dateStr[i])) throw InvalidDateException();
-		day = day * 10 + (dateStr[i] - '0');
-		i++;
+	while (dateStr[index] != '/' && dateStr[index] != '\0')
+	{
+		if (!std::isdigit(static_cast<unsigned char>(dateStr[index])))
+			throw InvalidDateException();
+		day = day * 10 + (dateStr[index++] - '0');
 	}
-	if (dateStr[i] != '/') throw InvalidDateException();
-	i++; // Skip '/'
+	if (dateStr[index] != '/')
+		throw InvalidDateException();
 
-	// Parse year
-	year = 0, digitCount = 0;
-	while (dateStr[i] != '\0') {
-		if (!isdigit(dateStr[i])) throw InvalidDateException();
-		year = year * 10 + (dateStr[i] - '0');
-		digitCount++;
-		i++;
+	++index;
+	year = 0;
+	int digitCount = 0;
+	while (dateStr[index] != '\0')
+	{
+		if (!std::isdigit(static_cast<unsigned char>(dateStr[index])))
+			throw InvalidDateException();
+		year = year * 10 + (dateStr[index++] - '0');
+		++digitCount;
 	}
-	if (digitCount != 4) throw InvalidDateException();
 
-	// Check valid month
-	if (month < 1 || month > 12) throw InvalidDateException();
+	if (digitCount != 4 || month < 1 || month > 12)
+		throw InvalidDateException();
 
-	// Check valid day based on month
 	int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
-	// Leap year check
-	if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
+	if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)
 		daysInMonth[1] = 29;
-	}
 
-	if (day < 1 || day > daysInMonth[month - 1]) throw InvalidDateException();
-} // End of tokenizeDate function
+	if (day < 1 || day > daysInMonth[month - 1])
+		throw InvalidDateException();
+}
 
-// Had to comment this out because it was causing an error, and I was running out of time to submit:
-// This function adds a piece of equipment to the inventory of the storage unit. It takes in an object of type T (which is the template parameter) and adds it to the vector of equipment using the push_back function.
-//template <typename T>
-//void StorageUnit<T>::addEquipment(T equipment)
-//{
-//	equipment.push_back(equipment);
-//}
+template <typename T>
+void StorageUnit<T>::addEquipment(const T& item)
+{
+	inventory.push_back(item);
+}
 
-// This function sorts the inventory of the storage unit by equipment ID using the overloaded less-than operator in the Equipment class. It uses the sort function from the algorithm library to sort the vector of equipment.
+template <typename T>
+bool StorageUnit<T>::containsEquipmentId(int equipmentId) const
+{
+	return std::any_of(inventory.begin(), inventory.end(), [equipmentId](const T& item)
+	{
+		return item.getId() == equipmentId;
+	});
+}
+
+template <typename T>
+std::size_t StorageUnit<T>::getInventorySize() const
+{
+	return inventory.size();
+}
+
 template <typename T>
 void StorageUnit<T>::sortInventory()
 {
-	std::sort(equipment.begin(), equipment.end());
+	std::sort(inventory.begin(), inventory.end());
 }
 
-// This function prints the information of the storage unit to the console. It also prints the rental contract details and whether or not the storage unit is humidity controlled and whether or not the rental contract auto-renews.
 template <typename T>
 void StorageUnit<T>::printUnitInformation() const
 {
-	std::string display_humidity_controlled = "";
-	std::string display_auto_renew = "";
 	std::cout << "Storage Unit Information" << std::endl;
-	std::cout << std::setfill('-') << std::setw(64) << "" << std::setfill(' ') << std::endl;
+	std::cout << std::setfill('-') << std::setw(STORAGE_UNIT_SCREEN_WIDTH) << "" << std::setfill(' ') << std::endl;
 	std::cout << "ID: " << getId() << std::endl;
 	std::cout << "Description: " << getDescription() << std::endl;
 	std::cout << "Dimensions (LxWxH): " << getLength() << " x " << getWidth() << " x " << getHeight() << " feet" << std::endl << std::endl;
-	(getHumidityControlled() == true) ? (display_humidity_controlled = "is") : (display_humidity_controlled = "is not");
-	std::cout << "**Storage unit " << display_humidity_controlled << " humidity controlled." << std::endl << std::endl;
+	std::cout << "**Storage unit " << (getHumidityControlled() ? "is" : "is not") << " humidity controlled." << std::endl << std::endl;
 	std::cout << "Rental Contract Details" << std::endl;
-	std::cout << "Cost Per Month: $" << getCostPerMonth() << std::endl;
+	std::cout << std::fixed << std::setprecision(2) << "Cost Per Month: $" << getCostPerMonth() << std::endl;
 	std::cout << "Date Signed: " << getDateRented() << std::endl << std::endl;
-	(getAutoRenewal() == true) ? (display_auto_renew = "does") : (display_auto_renew = "does not");
-	std::cout << "**Rental contract " << display_auto_renew << " auto-renew." << std::endl;
+	std::cout << "**Rental contract " << (getAutoRenewal() ? "does" : "does not") << " auto-renew." << std::endl;
 }
 
-// This function prints the inventory of the storage unit to the console. It first sorts the inventory by equipment ID and then prints the details of each piece of equipment in a table format. The type or mode of the equipment is also printed in the last column, and whether it is display mode or operation mode depends on whether the equipment is a monitor or mobility equipment (which is determined by the equipmentType parameter that is passed into the function).
 template <typename T>
-void StorageUnit<T>::printInventory(std::string equipmentType) const
+void StorageUnit<T>::printInventory(const std::string& equipmentType) const
 {
-	// Had to comment this out because it was causing an error, and I was running out of time to submit:
-	// sortInventory();
+	std::vector<T> sortedInventory = inventory;
+	std::sort(sortedInventory.begin(), sortedInventory.end());
 
 	std::cout << std::fixed << std::setprecision(2);
 	std::cout << std::setfill('-') << std::setw(100) << "" << std::setfill(' ') << std::endl;
-	int centeredTextX1 = calculateCenteredTextX("Health Case Options, Inc."); // To get a value for setw that will center the text
-	std::cout << std::right << std::setw(centeredTextX1) << "Health Care Options, Inc." << std::endl;
-	int centeredTextX2 = calculateCenteredTextX(equipmentType + " Equipment Inventory"); // To get a value for setw that will center the text
-	std::cout << std::right << std::setw(centeredTextX2) << equipmentType + " Inventory" << std::endl;
+	std::cout << std::right << std::setw(calculateCenteredTextX("Health Care Options, Inc.")) << "Health Care Options, Inc." << std::endl;
+	std::cout << std::right << std::setw(calculateCenteredTextX(equipmentType + " Equipment Inventory")) << equipmentType << " Equipment Inventory" << std::endl;
 	std::cout << std::setfill('-') << std::setw(100) << "" << std::setfill(' ') << std::endl << std::endl;
-	std::cout << std::left << std::setw(5) << "ID" << std::setw(25) << "Name" << std::setw(15) << "Purchase Date" << std::setw(15) << "Original Cost" << std::setw(14) << "Useful Life" << std::setw(15) << "Salvage Value" << "Type/Mode" << std::endl;
+	std::cout << std::left << std::setw(5) << "ID" << std::setw(25) << "Name" << std::setw(15) << "Purchase Date"
+		<< std::setw(15) << "Original Cost" << std::setw(14) << "Useful Life" << std::setw(15) << "Salvage Value" << "Type/Mode" << std::endl;
 	std::cout << std::setfill('-') << std::setw(100) << "" << std::setfill(' ') << std::endl;
-	for (int i = 0; i < equipment.size(); i++)
-		std::cout << std::left << std::setw(5) << equipment[i].getId() << std::setw(25) << equipment[i].getName() << std::setw(15) << equipment[i].getPurchaseDate() << std::setw(15) << equipment[i].getOriginalCost() << std::setw(14) << equipment[i].getUsefulLife() << std::setw(15) << equipment[i].getSalvageValue() << std::endl; // Had to comment this out because it was causing an error, and I was running out of time to submit: << (equipmentType == "Monitor" ? equipment[i].getDisplayType() : equipment[i].getOperationMode()) << std::endl;
+
+	for (const T& item : sortedInventory)
+		item.printDetails(std::cout);
 }
 
-// This function calculates the value for setw that will center text on the screen. It takes in a string and returns an integer that is the value for setw that will center that string on the screen. It uses the constant SCREEN_WIDTH to calculate this value, which is defined in the Main.cpp file.
 template <typename T>
-int StorageUnit<T>::calculateCenteredTextX(std::string s) const
+int StorageUnit<T>::calculateCenteredTextX(const std::string& text) const
 {
-	return SCREEN_WIDTH_2 / 2 + s.size() / 2;
+	return STORAGE_UNIT_SCREEN_WIDTH / 2 + static_cast<int>(text.size()) / 2;
 }

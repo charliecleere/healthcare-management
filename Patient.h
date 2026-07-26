@@ -57,7 +57,8 @@ public:
 	void addVisit(Visit v);
 
 	Visit getVisit(int index) const;
-	int getNumOfVisits() const;
+	int getNumVisits() const;
+	bool hasVisitId(int visit_id) const;
 private:
 	int id;
 	std::string first_name;

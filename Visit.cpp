@@ -1,5 +1,8 @@
 #include "Visit.h"
 
+#include <cctype>
+#include <cstring>
+
 // Constructor with a default parameter
 Visit::Visit(int i, Nurse n, Aide a)
 {
@@ -35,7 +38,7 @@ Aide Visit::getAide() const
 	return aide;
 }
 
-void::Visit::setId(int i)
+void Visit::setId(int i)
 {
 	if (i < 0)
 	{
@@ -76,7 +79,7 @@ void Visit::printVisit(std::ostream& out) const
 	if (services.size() > 0)
 	{
 		out << std::setw(12) << "" << std::left << std::setw(25) << "Service(s) provided: " << std::endl;
-		for (int i = 0; i < services.size(); i++)
+		for (std::size_t i = 0; i < services.size(); i++)
 		{
 			out << std::setw(12) << "" << std::left << "- " << services[i].getName() << std::endl;
 		}
@@ -85,16 +88,17 @@ void Visit::printVisit(std::ostream& out) const
 }
 
 // Function to tokenize the date
-void Visit::tokenizeDate(char* dateStr, int& month, int& day, int& year)
+void Visit::tokenizeDate(const char* dateStr, int& month, int& day, int& year) const
 {
 	//ensure that the character array is in the correct format and parse out its month, day, and year
 	if (dateStr == nullptr || std::strlen(dateStr) == 0) throw InvalidDateException();
-	int len = std::strlen(dateStr);
+	const std::size_t len = std::strlen(dateStr);
 	if (len < 8 || len > 10) throw InvalidDateException();
 
 	// m/d/yyyy(8) to mm/dd/yyyy(10)
 	// Split string using manual parsing
-	int i{ 0 }, digitCount{ 0 };
+	std::size_t i{ 0 };
+	int digitCount{ 0 };
 
 	// Parse month
 	month = 0;

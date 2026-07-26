@@ -8,7 +8,7 @@
 
 class Date
 {
-	friend std::ostream& operator<<(std::ostream& output, Date d);
+	friend std::ostream& operator<<(std::ostream& output, const Date& d);
 
 public:
 	Date(int = 0, int = 0, int = 0);
