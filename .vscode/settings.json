@@ -1,9 +1,9 @@
 {
   "cmake.useCMakePresets": "always",
   "cmake.configureOnOpen": true,
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
   "cmake.preferredGenerators": [
     "Ninja",
     "Visual Studio 17 2022"
-  ],
-  "cmake.buildDirectory": "${workspaceFolder}/build/${buildType}"
+  ]
 }

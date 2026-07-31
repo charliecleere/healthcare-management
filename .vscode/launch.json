@@ -5,12 +5,12 @@
       "name": "Run Healthcare Management",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceFolder}\\build\\Debug\\healthcare_management.exe",
+      "program": "${command:cmake.launchTargetPath}",
       "args": [],
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}\\build\\Debug",
+      "cwd": "${command:cmake.launchTargetDirectory}",
       "console": "integratedTerminal",
-      "preLaunchTask": "build-debug"
+      "preLaunchTask": "CMake: build healthcare_management"
     }
   ]
 }

@@ -2,16 +2,10 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "build-debug",
-      "type": "shell",
-      "command": "cmake",
-      "args": [
-        "--build",
-        "build",
-        "--config",
-        "Debug",
-        "--parallel"
-      ],
+      "label": "CMake: build healthcare_management",
+      "type": "cmake",
+      "command": "build",
+      "targets": ["healthcare_management"],
       "group": "build",
       "problemMatcher": "$msCompile"
     }

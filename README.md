@@ -48,7 +48,9 @@ ctest --preset vs2022-debug --output-on-failure
 .\build\vs2022-debug\Debug\healthcare_management.exe
 ```
 
-In VS Code, open the folder and use the Run button or press `F5`. If VS Code asks you to choose a preset, select `ninja-debug`.
+In VS Code, install the recommended Microsoft C/C++ and CMake Tools extensions when prompted. Open the repository folder and let CMake Tools configure the `ninja-debug` preset. Then use the Run button or press `F5`; choose `Run Healthcare Management` if VS Code asks which launch configuration to use. This launch configuration builds and runs the complete CMake target, including every `.cpp` file.
+
+Do not choose `C/C++: cl.exe build and debug active file`. That generic option compiles only the currently open source file and requires a Visual Studio Developer Command Prompt, so it is not the project’s CMake workflow.
 
 The build automatically copies the included fictional `.txt` data files beside the executable. To import a sample patient, choose **Read patient information from file** and enter a filename such as `Demo Patient Aurora` without the `.txt` extension.
 
