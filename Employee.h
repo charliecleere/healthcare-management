@@ -7,19 +7,19 @@
 class Employee
 {
 public:
-	// Three-argument constructor with default parameters
+	// Initializes the employee identity using explicitly managed storage.
 	Employee(int i = 0, std::string fn = "", std::string ln = "");
 
-	// Copy constructor
+	// Performs a deep copy of the dynamically allocated identity fields.
 	Employee(const Employee& e);
 
-	// Destructor
+	// Releases the dynamically allocated identity fields.
 	~Employee();
 
-	// Overloaded assignment operator
+	// Replaces this employee with a deep copy of another employee.
 	void operator=(const Employee& e);
 
-	// Accessor and mutator functions
+	// Accessors and mutators for the employee identity.
 	void setId(int i);
 	void setFirstName(std::string fn);
 	void setLastName(std::string ln);
@@ -27,7 +27,7 @@ public:
 	std::string getFirstName() const;
 	std::string getLastName() const;
 
-	// Other function
+	// Writes the shared employee details.
 	void printDetails(std::ostream& out) const;
 
 private:

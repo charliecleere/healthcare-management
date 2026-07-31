@@ -2,23 +2,22 @@
 
 #include "Employee.h"
 
-// Publicly inherits the Employee class
+// A case manager extends the shared employee identity with salary and degree data.
 class CaseManager : public Employee
 {
 public:
-	// Five-argument constructor with default parameters
+	// Initializes the case manager's employee and role-specific fields.
 	CaseManager(int i = 0, std::string fn = "", std::string ln = " ", double s = 0.0, std::string d = "");
 
-	// Destructor
 	~CaseManager();
 
-	// Accessor and mutator functions
+	// Accessors and mutators for case-manager-specific fields.
 	void setSalary(double s);
 	void setDegree(std::string d);
 	double getSalary() const;
 	std::string getDegree() const;
 
-	// Other function
+	// Writes the case manager's complete employee report entry.
 	void printDetails(std::ostream& out) const;
 private:
 	double salary;

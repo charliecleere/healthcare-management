@@ -1,6 +1,5 @@
 #include "Employee.h"
 
-// Three-argument constructor with default parameters
 Employee::Employee(int i, std::string fn, std::string ln)
 {
 	id = new int(i);
@@ -8,7 +7,7 @@ Employee::Employee(int i, std::string fn, std::string ln)
 	last_name = new std::string(ln);
 }
 
-// Copy constructor
+// Deep-copy the dynamically allocated identity fields.
 Employee::Employee(const Employee& e)
 {
 	this->id = new int(e.getId());
@@ -16,7 +15,7 @@ Employee::Employee(const Employee& e)
 	this->last_name = new std::string(e.getLastName());
 }
 
-// Destructor
+// Release the dynamically allocated identity fields.
 Employee::~Employee()
 {
 	delete id;
@@ -27,7 +26,7 @@ Employee::~Employee()
 	last_name = nullptr;
 }
 
-// Overloaded assignment operator
+// Copy the identity values into already allocated storage.
 void Employee::operator=(const Employee& e)
 {
 	this->setId(e.getId());

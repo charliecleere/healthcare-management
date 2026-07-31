@@ -1,19 +1,16 @@
 #include "Service.h"
 
-// Constructor with default parameters
 Service::Service(int i, std::string n)
 {
 	setId(i);
 	setName(n);
 }
 
-// Destructor
 Service::~Service()
 {
 
 }
 
-// Accessor and mutator functions
 int Service::getId() const
 {
 	return id;

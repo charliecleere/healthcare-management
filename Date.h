@@ -1,6 +1,5 @@
 #pragma once
 
-// Libraries needed
 #include <iostream>
 #include <cstdlib>
 #include <cctype>

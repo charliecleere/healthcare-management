@@ -16,7 +16,7 @@ Date::~Date()
 
 }
 
-// Mutator func
+// Stores the calendar components; callers validate input before setting dates.
 void Date::setDate(int  m, int d, int y)
 {
 	month = m;

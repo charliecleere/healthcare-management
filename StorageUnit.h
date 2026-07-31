@@ -16,8 +16,8 @@
 
 constexpr int STORAGE_UNIT_SCREEN_WIDTH = 64;
 
-// A storage unit holds one concrete equipment type while sharing the same
-// rental and inventory behavior with every other unit.
+// Stores one concrete equipment type and provides shared rental, validation,
+// duplicate-detection, sorting, and reporting behavior through a template.
 template <typename T>
 class StorageUnit
 {

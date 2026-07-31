@@ -15,10 +15,10 @@
 
 using namespace std;
 
-// Global constants
-const int MAX_NUM_OF_NURSES = 50;  // 7 in the file
-const int MAX_NUM_OF_AIDES = 50;  // 9 in the file
-const int MAX_NUM_OF_CASE_MANAGERS = 50;  // 5 in the file
+// Capacity limits for the explicitly managed employee arrays.
+const int MAX_NUM_OF_NURSES = 50;
+const int MAX_NUM_OF_AIDES = 50;
+const int MAX_NUM_OF_CASE_MANAGERS = 50;
 const string SERVICES_FILE_NAME = "Services";
 const string NURSES_DATA_FILE_NAME = "Nurses";
 const string AIDES_DATA_FILE_NAME = "Aides";
@@ -28,7 +28,7 @@ const int MAX_NUM_OF_PATIENTS = 50;
 const int SCREEN_WIDTH = 64;
 
 
-// Function prototypes
+// Application workflow and reporting helpers.
 void loadServicesFromFile(vector<Service>& services, bool& files_are_open);
 
 template <typename T>
@@ -97,7 +97,6 @@ void addEquipmentToStorageUnit(StorageUnit<MonitorEquipment>& monitor_equipment_
 
 int main()
 {
-	// Local variables
 	vector<Patient> patients;
 	vector<Service> services;
 	Nurse** nurses = new Nurse*[MAX_NUM_OF_NURSES];
@@ -127,17 +126,14 @@ int main()
 	for (int i = 0; i < MAX_NUM_OF_CASE_MANAGERS; i++)
 		case_managers[i] = nullptr;
 
-	// Loads from a file the vector of services with service IDs and the services that correspond to each ID
 	loadServicesFromFile(services, files_are_open);
 
-	// Loads from a file the three employee vectors (nurses, aides, and caseManagers) with employees and their information. After each vector is loaded it is sorted by last name.
 	loadEmployeeData(nurses, NURSES_DATA_FILE_NAME, files_are_open);
 	loadEmployeeData(aides, AIDES_DATA_FILE_NAME, files_are_open);
 	loadEmployeeData(case_managers, CASE_MANAGERS_DATA_FILE_NAME, files_are_open);
 
 	loadEquipmentData(equipment, files_are_open);
 
-	// If all the files opened properly then do the following, otherwise (i.e., if one or more don't open properly) skip the following
 	if (files_are_open)
 	{
 		for (int i = 0; i < MAX_NUM_OF_NURSES && nurses[i] != nullptr; i++)
@@ -155,40 +151,35 @@ int main()
 			num_of_case_managers++;
 		}
 
-		// The following sort by last name
+		// Keep employee reports alphabetized by last name.
 		sortEmployees(nurses, num_of_nurses);
 		sortEmployees(aides, num_of_aides);
 		sortEmployees(case_managers, num_of_case_managers);
 
-		// Do the following until the user chooses to exit
 		do
 		{
-			// Prints the menu, gets the user choice, and stores it in variable
 			main_menu_choice = printMainMenu();
 
 			switch (main_menu_choice)
 			{
-			case 1: // Patient management option from main menu
+			case 1: // Patient management.
 				do
 				{
 					patient_menu_choice = printPatientMenu();
 
 					switch (patient_menu_choice)
 					{
-					case 1: // Add new patient manually option from patient submenu
-						// If there is no more room for additional patients this will not allow the user to add anymore 
+					case 1: // Add a patient manually.
 						if (patients.size() >= MAX_NUM_OF_PATIENTS)
 						{
 							cout << "Health Care Options, Inc. is not accepting anymore new patients at this time." << endl << endl;
 						}
 						else
 						{
-							// User to manually inputs all the patient data. The data is stored in a patient object. Then, it returns that patient object back to main and adds it to the end of the patients vector
 							patients.push_back(buildPatientFromUserInput(patients));
 						}
 						break;
-					case 2: // Read patient information from file option from patient submenu
-						// If there is no more room for additional patients this will not allow the user to add anymore 
+					case 2: // Import a patient from a file.
 						if (patients.size() >= MAX_NUM_OF_PATIENTS)
 						{
 							cout << "Health Care Options, Inc. is not accepting anymore new patients at this time." << endl << endl;
@@ -198,22 +189,20 @@ int main()
 							patients.push_back(readPatientFromFile(patients));
 						}
 						break;
-					case 3: // Delete existing patient option from patient submenu
+					case 3: // Delete a patient.
 						deleteExistingPatient(patients);
 						break;
-					case 4: // Create visit for patient option from patient submenu
+					case 4: // Create a visit.
 						createVisitForPatient(patients, nurses, num_of_nurses, aides, num_of_aides, services);
 						break;
-					case 5: // Assign case manager to patient option from patient submenu
+					case 5: // Assign a case manager.
 						assignCaseManagerToPatient(patients, case_managers, num_of_case_managers);
 						break;
-					case 6: // Increase patient age by one year option from patient submenu
+					case 6: // Increment a patient's age.
 						incrementPatientAge(patients);
 						break;
-					case 7: // Print patient report to screen option from patient submenu
-						// Sorts the patients vector by patient ID number
+					case 7: // Print the patient report.
 						sortPatientById(patients);
-						// Prints to the screen all the patient objects that have been loaded into the array
 						for (size_t i = 0; i < patients.size(); i++)
 						{
 							patients[i].sortBpms();
@@ -224,21 +213,15 @@ int main()
 						cout << right << setw(24) << "" << "End of Report" << endl;
 						cout << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 						break;
-					case 8: // Save patients to a file option from patient submenu
-						// Sorts the patients vector by patient ID number
+					case 8: // Save the patient report to a file.
 						sortPatientById(patients);
-						// Prompting the user for a file name
 						cout << "Please enter the name of the file to save the patient report to (don't include .txt): ";
 
 						cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-						// Storing the user's chosen file name in a variable
 						getline(cin, output_file_name);
-
-						// Opening the file
 						output_file.open(output_file_name + ".txt");
 
-						// Prints to a file all the patient objects that have been loaded into the array
 						for (size_t i = 0; i < patients.size(); i++)
 						{
 							patients[i].sortBpms();
@@ -249,13 +232,11 @@ int main()
 						output_file << right << setw(24) << "" << "End of Report" << endl;
 						output_file << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 
-						// Closes the file
 						output_file.close();
 
-						//To let the user know that the information was successfully saved to a file
 						cout << endl << "The patient information was successfully saved to a file." << endl << endl;
 						break;
-					case 9: // Return to main menu option from patient submenu
+					case 9: // Return to the main menu.
 						break;
 					default:
 						cout << "Error. Invalid menu choice. Please try again." << endl;
@@ -265,17 +246,17 @@ int main()
 						waitForEnter();
 				} while (patient_menu_choice != 9);
 				break;
-			case 2: // Employee management option from main menu
+			case 2: // Employee management.
 				do
 				{
 					employee_menu_choice = printEmployeeMenu();
 
 					switch (employee_menu_choice)
 					{
-					case 1: // Print employee report to screen option from employee submenu
+					case 1: // Print the employee report.
 						printEmployeeReport(cout, nurses, num_of_nurses, aides, num_of_aides, case_managers, num_of_case_managers);
 						break;
-					case 2: // Return to main menu option from employee submenu
+					case 2: // Return to the main menu.
 						break;
 					default:
 						cout << "Error. Invalid menu choice. Please try again." << endl;
@@ -285,63 +266,63 @@ int main()
 						waitForEnter();
 				} while (employee_menu_choice != 2);
 				break;
-			case 3: // Equipment management option from main menu
+			case 3: // Equipment management.
 				do
 				{
 					equipment_menu_choice = printEquipmentMenu();
 
 					switch (equipment_menu_choice)
 					{
-					case 1: // Print equipment list to screen option from equipment submenu
+					case 1: // Print the equipment list.
 						showEquipmentList(equipment);
 						break;
-					case 2: // Produce depreciation schedule for equipment option from equipment submenu
+					case 2: // Print an equipment depreciation schedule.
 						showEquipmentList(equipment);
 						equipment[getAndSearchForEquipmentId(equipment, "Enter the ID of the equipment you want to see the depreciation schedule for: ")]->depreciate(cout);
 						break;
-					case 3: // Update storage unit information option from the equipment submenu
+					case 3: // Update storage-unit information.
 						unit_type_choice = promptForStorageUnitType();
 						
 						switch (unit_type_choice)
 						{
-						case 1: // Update mobility equipment storage unit information
+						case 1: // Update the mobility unit.
 							updateStorageUnitInformation(mobility_equipment_unit);
 							break;
-						case 2: // Update monitor equipment storage unit information
+						case 2: // Update the monitor unit.
 							updateStorageUnitInformation(monitor_equipment_unit);
 							break;
-						case 0: // Exit
+						case 0: // Cancel.
 							break;
 						default:
 							cout << "Error. Invalid menu choice. Please try again." << endl;
 							break;
 						}
 						break;
-					case 4: // Add equipment to storage unit
+					case 4: // Add equipment to a storage unit.
 						showEquipmentList(equipment);
 						addEquipmentToStorageUnit(monitor_equipment_unit, mobility_equipment_unit, equipment);
 						break;
-					case 5: // View storage unit information
+					case 5: // View storage-unit information.
 						unit_type_choice = promptForStorageUnitType();
 
 						switch (unit_type_choice)
 						{
-						case 1: // View mobility equipment storage unit information
+						case 1: // View the mobility unit.
 							mobility_equipment_unit.printUnitInformation();
 							mobility_equipment_unit.printInventory("Mobility");
 							break;
-						case 2: // View monitor equipment storage unit information
+						case 2: // View the monitor unit.
 							monitor_equipment_unit.printUnitInformation();
 							monitor_equipment_unit.printInventory("Monitor");
 							break;
-						case 0: // Exit
+						case 0: // Cancel.
 							break;
 						default:
 							cout << "Error. Invalid menu choice. Please try again." << endl;
 							break;
 						}
 						break;
-					case 6: // Return to main menu option from equipment submenu
+					case 6: // Return to the main menu.
 						break;
 					default:
 						cout << "Error. Invalid menu choice. Please try again." << endl;
@@ -351,8 +332,7 @@ int main()
 						waitForEnter();
 				} while (equipment_menu_choice != 6);
 				break;
-			case 4: // Exit option from main menu
-				// Lets the user know that the system closed down properly
+			case 4: // Exit the application.
 				cout << "Thank you for using the Patient Management System." << endl << endl;
 				break;
 			default:
@@ -361,7 +341,7 @@ int main()
 			}
 		} while (main_menu_choice != 4);
 
-		// Deallocates memory
+		// Release the explicitly managed employee and equipment objects.
 		for (int i = 0; i < num_of_nurses; i++)
 		{
 			delete nurses[i];
@@ -403,7 +383,7 @@ int main()
 
 // Function definitions
 
-// Loads the vector of services with information from a file
+// Load service identifiers and names from the bundled data file.
 void loadServicesFromFile(vector<Service>& services, bool& files_are_open)
 {
 	ifstream input_file;
@@ -429,7 +409,7 @@ void loadServicesFromFile(vector<Service>& services, bool& files_are_open)
 	input_file.close();
 }
 
-// Template function to load the three employee vectors (nurses, aides, and caseManagers) with employees and their information from a file
+// Load one employee type into its explicitly managed pointer array.
 template <typename T>
 void loadEmployeeData(T** &employees, const string& file_name, bool& files_are_open)
 {
@@ -439,7 +419,7 @@ void loadEmployeeData(T** &employees, const string& file_name, bool& files_are_o
 	string temp_emp_last_name = "";
 	double temp_earnings = 0.0;
 	string temp_credentials = "";
-	int i = 0;  // To keep track of the index as the while loop goes through the array
+	int i = 0;
 
 	input_file.open(file_name + ".txt");
 
@@ -510,7 +490,7 @@ void loadEquipmentData(vector<Equipment*>& equipment, bool& files_are_open)
 	input_file.close();
 }
 
-// Template selection sort function to sort the nurses, aides, and case manager vectors by last name
+// Sort an employee pointer array by last name.
 template <typename T>
 void sortEmployees(T** &employees, int num_of_employees)
 {
@@ -529,22 +509,21 @@ void sortEmployees(T** &employees, int num_of_employees)
 				smallest_index = location;
 		}
 
-		// Above it finds the vector object whose last name comes next in alphabetical order, but below it swaps the entire vector object
 		temp_employee = employees[smallest_index];
 		employees[smallest_index] = employees[index];
 		employees[index] = temp_employee;
 	}
 }
 
-// Function to print the main menu, get the user choice, and error checks that choice
+// Display the main menu and return a validated selection.
 int printMainMenu()
 {
 	int choice = ' ';
 
 	cout << setfill('-') << setw(64) << "" << setfill(' ') << endl;
-	int centeredTextX1 = calculateCenteredTextX("Health Case Options, Inc."); // To get a value for setw that will center the text
+	int centeredTextX1 = calculateCenteredTextX("Health Case Options, Inc.");
 	cout << right << setw(centeredTextX1) << "Health Care Options, Inc." << endl;
-	int centeredTextX2 = calculateCenteredTextX("Management"); // To get a value for setw that will center the text
+	int centeredTextX2 = calculateCenteredTextX("Management");
 	cout << right << setw(centeredTextX2) << "Management" << endl;
 	cout << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 	cout << "1. Patient Management" << endl;
@@ -566,14 +545,14 @@ int printMainMenu()
 	return choice;
 }
 
-// Function to print the patient management submenu, get the user choice, and error checks that choice
+// Display patient-management actions and return a validated selection.
 int printPatientMenu()
 {
 	int choice = ' ';
 	cout << setfill('-') << setw(64) << "" << setfill(' ') << endl;
-	int centeredTextX1 = calculateCenteredTextX("Health Case Options, Inc."); // To get a value for setw that will center the text
+	int centeredTextX1 = calculateCenteredTextX("Health Case Options, Inc.");
 	cout << right << setw(centeredTextX1) << "Health Care Options, Inc." << endl;
-	int centeredTextX2 = calculateCenteredTextX("Patient Management"); // To get a value for setw that will center the text
+	int centeredTextX2 = calculateCenteredTextX("Patient Management");
 	cout << right << setw(centeredTextX2) << "Patient Management" << endl;
 	cout << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 	cout << "1. Add new patient manually" << endl;
@@ -600,14 +579,14 @@ int printPatientMenu()
 	return choice;
 }
 
-// Function to print the employee management submenu, get the user choice, and error checks that choice
+// Display employee-management actions and return a validated selection.
 int printEmployeeMenu()
 {
 	int choice = ' ';
 	cout << setfill('-') << setw(64) << "" << setfill(' ') << endl;
-	int centeredTextX1 = calculateCenteredTextX("Health Case Options, Inc."); // To get a value for setw that will center the text
+	int centeredTextX1 = calculateCenteredTextX("Health Case Options, Inc.");
 	cout << right << setw(centeredTextX1) << "Health Care Options, Inc." << endl;
-	int centeredTextX2 = calculateCenteredTextX("Employee Management"); // To get a value for setw that will center the text
+	int centeredTextX2 = calculateCenteredTextX("Employee Management");
 	cout << right << setw(centeredTextX2) << "Employee Management" << endl;
 	cout << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 	cout << "1. Print employee report to screen" << endl;
@@ -627,14 +606,14 @@ int printEmployeeMenu()
 	return choice;
 }
 
-// Function to print the equipment management submenu, get the user choice, and error checks that choice
+// Display equipment-management actions and return a validated selection.
 int printEquipmentMenu()
 {
 	int choice = ' ';
 	cout << setfill('-') << setw(64) << "" << setfill(' ') << endl;
-	int centeredTextX1 = calculateCenteredTextX("Health Case Options, Inc."); // To get a value for setw that will center the text
+	int centeredTextX1 = calculateCenteredTextX("Health Case Options, Inc.");
 	cout << right << setw(centeredTextX1) << "Health Care Options, Inc." << endl;
-	int centeredTextX2 = calculateCenteredTextX("Equipment Management"); // To get a value for setw that will center the text
+	int centeredTextX2 = calculateCenteredTextX("Equipment Management");
 	cout << right << setw(centeredTextX2) << "Equipment Management" << endl;
 	cout << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 	cout << "1. Print equipment list to screen" << endl;
@@ -658,14 +637,14 @@ int printEquipmentMenu()
 	return choice;
 }
 
-// Function that allows the user to manually input all the patient data while error checking the inputs and then storing their input in a patient object. Then, it returns that patient object back to main
-Patient buildPatientFromUserInput(const vector<Patient>& patients)  // I pass in the patients vector to this function to be able to check that the random patient ID that is generated is not already being used by another patient in the vector
+// Collect and validate a new patient's data, including a unique generated ID.
+Patient buildPatientFromUserInput(const vector<Patient>& patients)
 {
 	random_device rdevice{};
 	default_random_engine num{ rdevice() };
 	uniform_int_distribution<unsigned int> randomNum{ 1, 1000 };
 
-	// Declare and initialize all the temp variables
+	// Collect input in local values before constructing the patient.
 	Patient temp_patient;
 	int temp_patient_id = 0;
 	string temp_first_name = "";
@@ -772,7 +751,7 @@ Patient buildPatientFromUserInput(const vector<Patient>& patients)  // I pass in
 		temp_temp_is_ambulatory = false;
 	temp_patient.setIsAmbulatory(temp_temp_is_ambulatory);
 
-	// Prompt the user for the amount of bpm readings they will enter in, error check the value, and store it in a variable
+	// Validate the number of BPM readings to collect.
 	cout << "How many heart rate (bpm) readings do you want to enter? ";
 	cin >> num_of_bpm_readings;
 	while (cin.fail() || num_of_bpm_readings < 0)
@@ -785,7 +764,7 @@ Patient buildPatientFromUserInput(const vector<Patient>& patients)  // I pass in
 		cin >> num_of_bpm_readings;
 	}
 
-	// Based on how many bpm readings the user wants to enter, loop that many times with each time getting a bpm to add to the vector
+	// Collect each requested BPM reading.
 	for (int i = 0; i < num_of_bpm_readings; i++)
 	{
 		do
@@ -803,12 +782,11 @@ Patient buildPatientFromUserInput(const vector<Patient>& patients)  // I pass in
 		} while (temp_patient.addSingleBpm(temp_bpm_reading) == false);
 	}
 	cout << endl;
-	// Returns back to main the patient object (i.e., the one we just put all the data into)
 	return temp_patient;
 }
 
-// Function that allows the user to enter a file name to read data from. It error checks their file name. It load the data from the file into a patient object
-Patient readPatientFromFile(const vector<Patient>& patients)  // I pass in the patients vector to this function to be able to check that the random patient ID that is generated is not already being used by another patient in the vector
+// Import a patient record from a named demo-data file and assign a unique ID.
+Patient readPatientFromFile(const vector<Patient>& patients)
 {
 	random_device rdevice{};
 	default_random_engine num{ rdevice() };
@@ -832,10 +810,9 @@ Patient readPatientFromFile(const vector<Patient>& patients)  // I pass in the p
 	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	getline(cin, input_file_name);
 
-	// When user inputs the file name this add .txt to whatever he inputted
 	input_file.open(input_file_name + ".txt");
 
-	// Start and continue doing this loop when the file has an error opening
+	// Keep prompting until the requested file can be opened.
 	while (!input_file)
 	{
 		cout << "Error in opening the file successfully. Please re-enter the file name (without using txt.): ";
@@ -874,7 +851,7 @@ Patient readPatientFromFile(const vector<Patient>& patients)  // I pass in the p
 	return temp_patient;
 }
 
-// Function that will delete a patient that the user chooses from the patient vector
+// Confirm and remove a patient selected by ID.
 void deleteExistingPatient(vector<Patient>& patients)
 {
 	int patient_id_to_remove = 0;
@@ -894,7 +871,6 @@ void deleteExistingPatient(vector<Patient>& patients)
 		cin >> patient_id_to_remove;
 	}
 
-	// Searches the patient vector for a patient object with the ID the user selected. If found it returns the index of that object. Otherwise it returns -1
 	patient_index_to_remove = searchForIdInVector(patients, patient_id_to_remove);
 
 	if (patient_index_to_remove != -1)
@@ -937,7 +913,7 @@ void showPatientList(const vector<Patient>& patients)
 	cout << endl;
 }
 
-// Function to add a visit (and it's information) to a patient of the user's choice
+// Create and attach a visit to a selected patient.
 void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of_nurses, Aide** aides, int num_of_aides, const vector<Service>& services)
 {
 	int patient_id_to_add_visit_to = 0;
@@ -967,7 +943,6 @@ void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of
 	}
 	cout << endl;
 
-	// Finds the index of the patient to add a visit to. If patient is not found it returns a -1
 	patient_index_to_add_visit_to = searchForIdInVector(patients, patient_id_to_add_visit_to);
 
 	if (patient_index_to_add_visit_to != -1)
@@ -1020,10 +995,9 @@ void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of
 
 		do
 		{
-			// Displays the nurses and their corresponding ID's for the user to select from. Returns the nurse ID the user selects back to main and stores it in a variable
+			// Display available nurses and collect the selected ID.
 			nurse_id_to_assign_to_visit = getEmployeeIdChoice(nurses, num_of_nurses, "nurse", "visit");
 
-			// Zero is the option to not assign a nurse
 			if (nurse_id_to_assign_to_visit != 0)
 			{
 				nurse_index_to_assign_to_visit = searchForIdInDynArray(nurses, num_of_nurses, nurse_id_to_assign_to_visit);
@@ -1058,7 +1032,7 @@ void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of
 		{
 			cout << endl << "The following services are currently offered by HCO:" << endl << endl;
 
-			// Displays to the user the services offerered by HC0 and their corresponding ID numbers
+			// Display available services and collect the selected ID.
 			cout << left << setw(7) << "ID" << "Service Name" << endl;
 			cout << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 			for (const auto& i : services)
@@ -1091,7 +1065,7 @@ void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of
 
 		} while (service_id_to_add_to_visit != 0);
 
-		// The visit object now has all it's intended information. So now the visit can be added to the patient of the user's choice
+		// Attach the completed visit to the selected patient.
 		patients[patient_index_to_add_visit_to].addVisit(temp_visit);
 		cout << endl;
 	}
@@ -1099,7 +1073,7 @@ void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of
 		cout << "Patient ID not found." << endl << endl;
 }
 
-// Template function to search an ID in a vector
+// Return the index of a matching object ID, or -1 when absent.
 template <typename T>
 int searchForIdInVector(const vector<T>& values, int id_to_find)
 {
@@ -1111,7 +1085,7 @@ int searchForIdInVector(const vector<T>& values, int id_to_find)
 	return -1;
 }
 
-// The equipment vector is a vector of pointers, so this is a separate function than the one above that searches for an ID in a vector of objects. This function searches for an ID in a vector of pointers to objects
+// Search the pointer-based equipment collection by ID.
 int searchForIdInEquipmentVector(const vector<Equipment*>& equipment, int id_to_find)
 {
 	for (size_t i = 0; i < equipment.size(); ++i)
@@ -1132,7 +1106,7 @@ int searchForIdInVisitVector(const Patient& patient, int id_to_find)
 	return -1;
 }
 
-// Template function to search an ID in a dynamic array
+// Search an explicitly managed pointer array by ID.
 template <typename T>
 int searchForIdInDynArray(T** array, int array_size, int id_to_find)
 {
@@ -1156,7 +1130,7 @@ int searchForIdInDynArray(T** array, int array_size, int id_to_find)
 	return index_to_act_on;
 }
 
-// Template function to display a vector of employees and their ID's and get the user choice 
+// Display employee choices and return the selected ID.
 template <typename T>
 int getEmployeeIdChoice(T** employees, int num_of_employees, const string& emp_type_title, const string& assignment_target)
 {
@@ -1184,7 +1158,7 @@ int getEmployeeIdChoice(T** employees, int num_of_employees, const string& emp_t
 	return id;
 }
 
-// Function to assign a case manager to a patient of the user's choice
+// Assign a selected case manager to a patient.
 void assignCaseManagerToPatient(vector<Patient>& patients, CaseManager** case_managers, int num_of_case_managers)
 {
 	int patient_id_to_assign_case_mgr_to = 0;
@@ -1205,21 +1179,18 @@ void assignCaseManagerToPatient(vector<Patient>& patients, CaseManager** case_ma
 		cin >> patient_id_to_assign_case_mgr_to;
 	}
 
-	// Search the patient vector for the ID the user's choice. If found return the index. If not, return a -1
 	patient_index_to_assign_case_mgr_to = searchForIdInVector(patients, patient_id_to_assign_case_mgr_to);
 
 	if (patient_index_to_assign_case_mgr_to != -1)
 	{
 		case_mgr_id_to_assign_to_patient = getEmployeeIdChoice(case_managers, num_of_case_managers, "case manager", "patient");
 
-		// Zero is the option to not assign a case manager
 		if (case_mgr_id_to_assign_to_patient != 0)
 		{
 			case_mgr_index_to_assign_to_patient = searchForIdInDynArray(case_managers, num_of_case_managers, case_mgr_id_to_assign_to_patient);
 
 			if (case_mgr_index_to_assign_to_patient != -1)
 			{
-				// If the case manager ID that the user wants to add to a patient is found then add that case manager to the patient of the user's choice
 				patients[patient_index_to_assign_case_mgr_to].setCaseManager(*case_managers[case_mgr_index_to_assign_to_patient]);
 			}
 			else
@@ -1250,7 +1221,6 @@ void incrementPatientAge(vector<Patient>& patients)
 	}
 	cout << endl;
 
-	// Finds the index of the patient to add a visit to. If patient is not found it returns a -1
 	patient_index_to_add_age_to = searchForIdInVector(patients, patient_id_to_add_age_to);
 
 	if (patient_index_to_add_age_to != -1)
@@ -1270,7 +1240,7 @@ void incrementPatientAge(vector<Patient>& patients)
 
 		if (toupper(confirm_removal_choice) == 'Y')
 		{
-			patients[patient_index_to_add_age_to]++;  // Using the overloaded ++ operator from the patient class to increment the patient's age by one year
+			patients[patient_index_to_add_age_to]++;
 			cout << endl << "Patient's age was successfully incremented." << endl << endl;
 			cout << "This is the patient's updated information:" << endl << endl;
 			cout << patients[patient_index_to_add_age_to];
@@ -1300,7 +1270,7 @@ void sortPatientById(vector<Patient>& patients)
 	}
 }
 
-// Function to print all the nurses, aides, and case managers that work at HCO. It passes in the three vectors of employees that were loads from files at the beginning of main.
+// Write the nurse, aide, and case-manager report.
 void printEmployeeReport(ostream& out, Nurse** nurses, int num_of_nurses, Aide** aides, int num_of_aides, CaseManager** case_managers, int num_of_case_managers)
 {
 	out << fixed << setprecision(2);
@@ -1333,13 +1303,13 @@ void printEmployeeReport(ostream& out, Nurse** nurses, int num_of_nurses, Aide**
 void showEquipmentList(const vector<Equipment*>& equipment)
 {
 	vector<Equipment*> sorted_equipment = equipment;
-	sort(sorted_equipment.begin(), sorted_equipment.end(), [](Equipment* a, Equipment* b) { return *a < *b; });  // Uses lambda function
+	sort(sorted_equipment.begin(), sorted_equipment.end(), [](Equipment* a, Equipment* b) { return *a < *b; });
 
 	cout << fixed << setprecision(2);
 	cout << setfill('-') << setw(100) << "" << setfill(' ') << endl;
-	int centeredTextX1 = calculateCenteredTextX("Health Case Options, Inc."); // To get a value for setw that will center the text
+	int centeredTextX1 = calculateCenteredTextX("Health Case Options, Inc.");
 	cout << right << setw(centeredTextX1) << "Health Care Options, Inc." << endl;
-	int centeredTextX2 = calculateCenteredTextX("Equipment List"); // To get a value for setw that will center the text
+	int centeredTextX2 = calculateCenteredTextX("Equipment List");
 	cout << right << setw(centeredTextX2) << "Equipment List" << endl;
 	cout << setfill('-') << setw(100) << "" << setfill(' ') << endl << endl;
 	cout << left << setw(5) << "ID" << setw(25) << "Name" << setw(15) << "Purchase Date" << setw(15) << "Original Cost" << setw(14) << "Useful Life" << setw(15) << "Salvage Value" << "Type/Mode" << endl;
@@ -1348,7 +1318,7 @@ void showEquipmentList(const vector<Equipment*>& equipment)
 		item->printDetails(cout);
 }
 
-// Returns the index of the equipment object in the vector that has the ID that the user inputs.
+// Return the selected equipment index, retrying until the ID is found.
 int getAndSearchForEquipmentId(const vector<Equipment*>& equipment, const std::string& prompt)
 {
 	int equipment_id = 0;
@@ -1487,7 +1457,7 @@ void updateStorageUnitInformation(T& storage_unit)
 	storage_unit.printUnitInformation();
 }
 
-// Function to prompt the user to select a storage unit type. It returns the user's choice back to main.
+// Prompt for a storage-unit type or cancellation.
 int promptForStorageUnitType()
 {
 	while (true)

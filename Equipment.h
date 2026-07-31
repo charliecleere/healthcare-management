@@ -7,13 +7,12 @@
 class Equipment
 {
 public:
-	// Constructor with default parameters
+	// Stores the equipment identity, purchase information, and depreciation inputs.
 	Equipment(int i = 0, std::string n = "", double oc = 0.0, int ul = 0, double sv = 0.0);
 
-	// Destructor
 	virtual ~Equipment();
 
-	// Accessor and mutator functions
+	// Accessors and mutators for the equipment record.
 	int getId() const;
 	std::string getName() const;
 	Date getPurchaseDate() const;
@@ -31,19 +30,19 @@ public:
 
 	int calculateCenteredTextX(const std::string& s) const;
 
-	// Pure virtual function to calculate depreciation, making Equipment an abstract class
+	// Writes the derived equipment type's depreciation schedule.
 	virtual void depreciate(std::ostream& out) const = 0;
 
-	// Pure virtual function to print equipment details, can be overridden by derived classes
+	// Writes the derived equipment type's display fields.
 	virtual void printDetails(std::ostream& out) const = 0;
 
-	// Overloaded less-than operator to compare equipment by equipment ID for sorting
+	// Orders equipment by ID for sorted reports and inventories.
 	bool operator<(const Equipment& other) const; 
 private:
 	int id;
 	std::string name;
 	Date purchase_date;
 	double original_cost;
-	int useful_life;  // In years
+	int useful_life;
 	double salvage_value;
 };

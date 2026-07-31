@@ -2,23 +2,22 @@
 
 #include "Employee.h"
 
-// Publicly inherits the Employee class
+// A nurse extends the shared employee identity with wage and designation data.
 class Nurse : public Employee
 {
 public:
-	// Five-argument constructor with default parameters
+	// Initializes the nurse's employee and role-specific fields.
 	Nurse(int i = 0, std::string fn = "", std::string ln = "", double hw = 0.0, std::string d = "");
 
-	// Destructor
 	~Nurse();
 
-	// Accessor and mutator functions
+	// Accessors and mutators for nurse-specific fields.
 	void setHourlyWage(double hw);
 	void setDesignation(std::string d);
 	double getHourlyWage() const;
 	std::string getDesignation() const;
 
-	// Other function
+	// Writes the nurse's complete employee report entry.
 	void printDetails(std::ostream& out) const;
 
 private:

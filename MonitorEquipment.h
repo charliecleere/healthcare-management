@@ -5,27 +5,26 @@
 class MonitorEquipment : public Equipment
 {
 public:
-	// Constructor with default parameters
+	// Stores monitor-specific display information in addition to the base record.
 	MonitorEquipment(int i = 0, std::string n = "", double oc = 0.0, int ul = 0, double sv = 0.0, std::string dt = "");
 
-	// Destructor
 	~MonitorEquipment();
 
-	// Accessor and mutator functions
+	// Accessors and mutators for the display type.
 	void setDisplayType(std::string dt);
 	std::string getDisplayType() const;
 	
-	// Override the pure virtual function to calculate depreciation
+	// Writes the monitor's straight-line depreciation schedule.
 	void depreciate(std::ostream& out) const override;
 
-	// Override the virtual function to print equipment details
+	// Writes the monitor's details in the shared equipment-report format.
 	void printDetails(std::ostream& out) const;
 private:
 	std::string display_type;
 
-	// Utility function that is only to be called from the depreciation() function
+	// Recursively formats the complete straight-line depreciation schedule.
 	void produceDepreciationSchedule(std::ostream& out, int equipment_id, const std::string& equipment_name, double original_cost_value, int useful_life_value, double salvage_value_value) const;
 
-	// Utility function that is only to be called from the produceDepreciationSchedule() function
+	// Recursively calculates one period of straight-line depreciation.
 	void straightLineDepreciation(std::ostream& out, double original_cost_value, double book_value, double salvage_value_value, int useful_life_value, int period_number, double& total_depreciation_value) const;
 };

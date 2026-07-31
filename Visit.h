@@ -11,13 +11,12 @@
 class Visit
 {
 public:
-	// Constructor with a default parameter
+	// Initializes the visit and its optional care providers.
 	Visit(int i = 0, Nurse n = Nurse(), Aide a = Aide());
 
-	// Destructor
 	~Visit();
 
-	// Accessor and mutator functions
+	// Accessors and mutators for the visit record.
 	int getId() const;
 	Date getDate() const;
 	Nurse getNurse() const;
@@ -27,7 +26,7 @@ public:
 	void setNurse(Nurse n);
 	void setAide(Aide a);
 
-	// Other functions
+	// Adds services and writes the visit report.
 	void addService(Service s);
 	void printVisit(std::ostream& out) const;
 

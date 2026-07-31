@@ -1,12 +1,12 @@
 #pragma once
 
-#include <stdexcept>  // Contains runtime_error
+#include <stdexcept>
 
-// Custom exception class for invalid date format, inherits from std::runtime_error
+// Signals a date that is malformed or outside the calendar's valid range.
 class InvalidDateException : public std::runtime_error
 {
 public:
-	// Constructor that initializes the base class with a custom error message
+	// Supplies the user-facing validation message.
 	InvalidDateException() : std::runtime_error("Invalid date format.") 
 	{
 	

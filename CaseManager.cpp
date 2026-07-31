@@ -1,19 +1,16 @@
 #include "CaseManager.h"
 
-// Five-argument constructor with default parameters
 CaseManager::CaseManager(int i, std::string fn, std::string ln, double s, std::string d) : Employee(i, fn, ln)
 {
 	setSalary(s);
 	setDegree(d);
 }
 
-// Destructor
 CaseManager::~CaseManager()
 {
 
 }
 
-// Accessor and mutator functions
 void CaseManager::setSalary(double s)
 {
 	if (s < 0)

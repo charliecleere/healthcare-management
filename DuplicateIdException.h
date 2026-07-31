@@ -1,12 +1,12 @@
 #pragma once
 
-#include <stdexcept>  // Contains runtime_error
+#include <stdexcept>
 
-// Custom exception class for duplicate ID, inherits from std::runtime_error
+// Signals an attempt to reuse an identifier that must be unique.
 class DuplicateIdException : public std::runtime_error
 {
 public:
-	// Constructor that initializes the base class with a custom error message
+	// Supplies the user-facing validation message.
 	DuplicateIdException() : std::runtime_error("This ID already exists.")
 	{
 

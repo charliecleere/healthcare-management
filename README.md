@@ -1,6 +1,6 @@
 # HCO Patient & Equipment Management
 
-A C++ console application that models patient records, home-health employees, visits, durable medical equipment, depreciation, and typed storage-unit inventories for the fictional Health Care Options (HCO) organization.
+A C++ console application that models patient records, home health employees, visits, durable medical equipment, depreciation, and typed storage-unit inventories for the fictional Health Care Options (HCO) organization.
 
 This project began as a CSCN 112 course project and was independently completed, tested, and polished afterward as a public C++ foundations portfolio project.
 

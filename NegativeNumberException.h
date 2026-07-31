@@ -1,12 +1,12 @@
 #pragma once
 
-#include <stdexcept>  // Contains runtime_error
+#include <stdexcept>
 
-// Custom exception class for negative number, inherits from std::runtime_error
+// Signals a negative value where the domain requires a non-negative value.
 class NegativeNumberException : public std::runtime_error
 {
 public:
-	// Constructor that initializes the base class with a custom error message
+	// Supplies the user-facing validation message.
 	NegativeNumberException() : std::runtime_error("Only positive numbers are allowed.")
 	{
 

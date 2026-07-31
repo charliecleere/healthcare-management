@@ -6,13 +6,12 @@
 class Service
 {
 public:
-	// Two-argument constructor with default parameters
+	// Initializes the service identifier and display name.
 	Service(int i = 0, std::string n = "");
 
-	// Destructor
 	~Service();
 
-	// Accessor and mutator functions
+	// Accessors and mutators for the service record.
 	int getId() const;
 	std::string getName() const;
 	void setId(int i);

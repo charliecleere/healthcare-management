@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cctype>
 
-// Multi-argument constructor with default parameters
 Patient::Patient(int i, std::string fn, std::string ln, std::string sa, int a, double h, double w, char g, bool ia, CaseManager cm)
 {
 	setId(i);
@@ -18,13 +17,11 @@ Patient::Patient(int i, std::string fn, std::string ln, std::string sa, int a, d
 	setCaseManager(cm);
 }
 
-// Destructor
 Patient::~Patient()
 {
 
 }
 
-// Set functions
 void Patient::setId(int i)
 {
 	if (i < 0)
@@ -99,7 +96,6 @@ void Patient::setCaseManager(CaseManager cm)
 	case_manager = cm;
 }
 
-// Get functions
 int Patient::getId() const
 {
 	return id;
@@ -152,7 +148,6 @@ CaseManager Patient::getCaseManager() const
 
 std::ostream& operator<<(std::ostream& out, const Patient& patient)
 {
-	// I use "out" here instead of something like "cout" so that in my program both cout and output_file can be used when passed in as a parameter
 	std::string display_gender = "";
 	std::string display_is_ambulatory = "";
 	out << std::setfill('-') << std::setw(64) << "" << std::setfill(' ') << std::endl;
@@ -165,7 +160,6 @@ std::ostream& operator<<(std::ostream& out, const Patient& patient)
 	(toupper(static_cast<unsigned char>(patient.getGender())) == 'M') ? (display_gender = "Male") : (display_gender = "Female");
 	out << std::setw(12) << "" << std::left << std::setw(26) << "Gender:" << display_gender << std::endl;
 	out << std::endl;
-	// Translates the bool variable into the correct text that it should output
 	(patient.getIsAmbulatory() == true) ? (display_is_ambulatory = "Patient is ambulatory") : (display_is_ambulatory = "Patient is not ambulatory");
 	out << std::setw(12) << "" << "**** " << display_is_ambulatory << " ****" << std::endl << std::endl;
 	if (patient.getBpmCount() > 0)
@@ -182,9 +176,7 @@ std::ostream& operator<<(std::ostream& out, const Patient& patient)
 		out << std::setw(12) << "" << std::left << std::setw(26) << "Minimum heart rate (bpm): " << patient.findMinBpm() << std::endl;
 		out << std::setw(12) << "" << std::left << std::setw(26) << "Maximum heart rate (bpm): " << patient.findMaxBpm() << std::endl << std::endl;
 	}
-	// Print the case manager's name if there is one
 	out << std::setw(12) << "" << "Case manager: " << patient.getCaseManager().getFirstName() << " " << patient.getCaseManager().getLastName() << std::endl << std::endl;
-	// Prints all the visits (if there are any) and the data for each visit for this patient
 	if (patient.visits.size() > 0)
 	{
 		out << std::setw(19) << "" << "Visit Information" << std::endl << std::endl;
@@ -196,7 +188,7 @@ std::ostream& operator<<(std::ostream& out, const Patient& patient)
 	return out;
 }
 
-// Overloaded less-than operator to compare patients by first name for sorting
+// Orders patients by first name for alphabetical reports.
 bool Patient::operator<(const Patient& other) const
 {
 	if (this->getFirstName() < other.getFirstName())
@@ -205,14 +197,14 @@ bool Patient::operator<(const Patient& other) const
 		return false;
 }
 
-// Pre-increment operator to increment the patient's age by 1 year
+// Increment the age and return the updated patient.
 Patient Patient::operator++()
 {
 	setAge(getAge() + 1);
 	return *this;
 }
 
-// Post-increment operator to increment the patient's age by 1 year
+// Return the previous value, then increment the age.
 Patient Patient::operator++(int)
 {
 	Patient temp = *this;
@@ -220,7 +212,6 @@ Patient Patient::operator++(int)
 	return temp;
 }
 
-// For this function we need to pass in the bpm reading so we can add that reading to the bpms vector
 bool Patient::addSingleBpm(int temp_bpm_reading)
 {
 	bool is_valid = true;
@@ -250,13 +241,12 @@ int Patient::getBpmCount() const
 	return static_cast<int>(bpms.size());
 }
 
-// Bubble sort to sort the bpms vector in my class
 void Patient::sortBpms()
 {
 	std::sort(bpms.begin(), bpms.end());
 }
 
-// Returns back the smallest bpm in the bpms vector
+// Return the smallest reading, or -1 when no readings exist.
 int Patient::findMinBpm() const
 {
 	int temp_min_bpm = 0;
@@ -275,7 +265,7 @@ int Patient::findMinBpm() const
 	return temp_min_bpm;
 }
 
-// Returns back the largest bpm in the bpms vector
+// Return the largest reading, or -1 when no readings exist.
 int Patient::findMaxBpm() const
 {
 	int temp_max_bpm = 0;
@@ -295,7 +285,7 @@ int Patient::findMaxBpm() const
 
 }
 
-// Returns the average bpm of the bpms vector
+// Return the average reading, or -1 when no readings exist.
 double Patient::calculateAvgBpm() const
 {
 	double temp_avg_bpm = 0.0;
@@ -314,7 +304,6 @@ double Patient::calculateAvgBpm() const
 	return temp_avg_bpm;
 }
 
-// Function to add a visit to a patient
 void Patient::addVisit(Visit v)
 {
 	visits.push_back(v);

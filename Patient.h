@@ -6,11 +6,11 @@
 class Patient
 {
 public:
-	// Multi-argument constructor with default parameters
+	// Initializes the patient's demographics and optional case-manager assignment.
 	Patient(int i = 0, std::string fn = "", std::string ln = "", std::string sa = "", int a = 0, double h = 0.0, double w = 0.0, char g = ' ', bool ia = false, CaseManager cm = CaseManager());
 	~Patient();
 
-	// Get and set functions (or accessor and mutator functions)
+	// Accessors and mutators for the patient's record.
 	void setId(int i);
 	void setFirstName(std::string fn);
 	void setLastName(std::string ln);
@@ -32,19 +32,19 @@ public:
 	bool getIsAmbulatory() const;
 	CaseManager getCaseManager() const;
 	
-	// Overloaded insertion operator to print patient details
+	// Writes the patient's report, including case-manager and visit information.
 	friend std::ostream& operator<<(std::ostream& out, const Patient& patient);  
 
-	// Overloaded less-than operator to compare patients by first name for sorting
+	// Orders patients by first name for alphabetical reports.
 	bool operator<(const Patient& other) const;
 
-	// Overloaded pre-increment operator to increment the patient's age by 1 year
+	// Increments the patient's age and returns the updated patient.
 	Patient operator++();
 
-	// Overloaded post-increment operator to increment the patient's age by 1 year
+	// Increments the patient's age and returns its previous value.
 	Patient operator++(int);
 
-	// Other functions from Lab 2
+	// BPM readings and summary statistics.
 	bool addSingleBpm(int temp_bpm_reading);
 	int getSingleBpm(int index) const;
 	int getBpmCount() const;
@@ -53,7 +53,7 @@ public:
 	int findMaxBpm() const;
 	double calculateAvgBpm() const;
 
-	// Other functions from Lab 3
+	// Visit management and duplicate-visit checks.
 	void addVisit(Visit v);
 
 	Visit getVisit(int index) const;

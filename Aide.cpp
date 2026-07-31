@@ -1,19 +1,16 @@
 #include "Aide.h"
 
-// Five-argument constuctor with default parameters
 Aide::Aide(int i, std::string fn, std::string ln, double hw, std::string c) : Employee(i, fn, ln)
 {
 	setHourlyWage(hw);
 	setCertification(c);
 }
 
-// Destructor
 Aide::~Aide()
 {
 
 }
 
-// Accessor and Mutators
 void Aide::setHourlyWage(double hw)
 {
 	if (hw < 0)
