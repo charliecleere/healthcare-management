@@ -5,6 +5,7 @@
       "label": "CMake: build healthcare_management",
       "type": "cmake",
       "command": "build",
+      "preset": "ninja-debug",
       "targets": ["healthcare_management"],
       "group": "build",
       "problemMatcher": "$msCompile"

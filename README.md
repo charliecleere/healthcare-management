@@ -28,9 +28,41 @@ This project began as a CSCN 112 course project and was independently completed,
 | Exceptions | Duplicate IDs, invalid dates, and negative values |
 | File I/O | Startup data loading and patient report export |
 
-## Build and Run
+## Run in VS Code (Recommended)
 
-Requirements: CMake 3.20+ and a C++17 compiler. Visual Studio 2022 Community/MSVC is the primary Windows toolchain, and Ninja is the easiest option for VS Code use.
+### One-time setup
+
+Install the following on Windows:
+
+1. **Visual Studio 2022 Community** with the **Desktop development with C++** workload. This supplies the MSVC compiler, CMake, and Ninja used by the project.
+2. **Visual Studio Code** with the recommended extensions when VS Code prompts you:
+   - Microsoft C/C++
+   - Microsoft CMake Tools
+
+### First run
+
+1. Open this repository's folder in VS Code.
+2. Press `Ctrl+Shift+P`, run **Developer: Reload Window**, and wait for CMake Tools to configure the project.
+3. If VS Code asks for a configure preset, choose **`ninja-debug`**.
+4. Press `F5`.
+5. If VS Code asks for a launch configuration, choose **Run Healthcare Management**.
+6. The application opens in VS Code's integrated terminal. Enter `4` at the main menu to exit.
+
+For future runs, open the folder and press `F5`. VS Code remembers the selected project configuration.
+
+> Do not choose **C/C++: cl.exe build and debug active file**. That generic option tries to compile only the currently open `.cpp` file, while this is a multi-file CMake project.
+
+### If VS Code shows a CMake error
+
+1. Confirm Visual Studio's **Desktop development with C++** workload is installed.
+2. Run **Developer: Reload Window** from the Command Palette.
+3. Wait for CMake Tools to configure again, then press `F5` and select **Run Healthcare Management**.
+
+This repository's workspace settings automatically load Visual Studio's developer environment, allowing CMake Tools to find MSVC and Ninja without manually opening a Developer Command Prompt.
+
+## Run from a Terminal
+
+Open **Developer PowerShell for VS 2022** in the repository folder, then run:
 
 ```powershell
 cmake --preset ninja-debug
@@ -39,7 +71,7 @@ ctest --preset ninja-debug --output-on-failure
 .\build\ninja-debug\healthcare_management.exe
 ```
 
-For Visual Studio 2022, you can also use the `vs2022-debug` preset:
+For the Visual Studio generator instead of Ninja, use the `vs2022-debug` preset:
 
 ```powershell
 cmake --preset vs2022-debug
@@ -47,10 +79,6 @@ cmake --build --preset vs2022-debug
 ctest --preset vs2022-debug --output-on-failure
 .\build\vs2022-debug\Debug\healthcare_management.exe
 ```
-
-In VS Code, install the recommended Microsoft C/C++ and CMake Tools extensions when prompted. Open the repository folder and let CMake Tools configure the `ninja-debug` preset. Then use the Run button or press `F5`; choose `Run Healthcare Management` if VS Code asks which launch configuration to use. This launch configuration builds and runs the complete CMake target, including every `.cpp` file.
-
-Do not choose `C/C++: cl.exe build and debug active file`. That generic option compiles only the currently open source file and requires a Visual Studio Developer Command Prompt, so it is not the project’s CMake workflow.
 
 The build automatically copies the included fictional `.txt` data files beside the executable. To import a sample patient, choose **Read patient information from file** and enter a filename such as `Demo Patient Aurora` without the `.txt` extension.
 
