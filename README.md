@@ -1,108 +1,94 @@
 # HCO Patient & Equipment Management
 
-A polished C++ console application that models patient records, home-health employees, visits, durable medical equipment, depreciation schedules, and typed storage-unit inventories for the fictional Health Care Options (HCO) organization.
+A C++ console application that models patient records, home health employees, visits, durable medical equipment, depreciation, and typed storage-unit inventories for the fictional Health Care Options (HCO) organization.
 
-Originally developed across eight CSCN 112 labs and later cleaned up and refactored, this repository is intended as a portfolio-quality demonstration of solid C++ foundations and good engineering practices.
+This project began as a CSCN 112 course project and was independently completed, tested, and polished afterward as a public C++ foundations portfolio project.
 
-> This is a programming simulation for learning and demonstration purposes, not clinical software. All people and records are fictional.
+> This is a programming simulation, not clinical software. All included people and records are fictional demo data.
 
-Table of contents
-- Quick start (C++17, CMake) — build & run in a few commands
-- What this project demonstrates — C++ concepts and design decisions
-- Project structure & lab mapping
-- How to run (short platform notes)
-- Contributing, license, contact
+## Highlights
 
-Quick start (recommended)
-- Requirements: C++17-capable compiler (g++, clang, or MSVC), CMake 3.20+ (or the version your platform recommends), Git
+- Patient records with BPM statistics, visit history, case-manager assignment, reporting, and file import/export
+- Employee inheritance hierarchy for nurses, aides, and case managers
+- Equipment polymorphism with recursive straight-line and double-declining-balance depreciation reports
+- Template-based storage units that route monitor and mobility equipment into type-safe inventories
+- Exception-driven validation for duplicate visit IDs, invalid dates, and negative storage-unit values
+- Reproducible CMake build, CTest coverage, and Windows GitHub Actions CI
 
-1. Clone the repository:
-   git clone <repo-url>
-2. Create a build folder and configure with CMake (recommended):
-   mkdir build && cd build
-   cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17
-3. Build and run:
-   cmake --build . --config Release
-   ./healthcare_management   # on Windows use healthcare_management.exe
+## C++ Concepts Demonstrated
 
-Quick single-file compile (for quick smoke test on Unix-like systems)
-- g++ -std=c++17 -O2 src/*.cpp -Iinclude -o healthcare_management
-- ./healthcare_management
+| Concept | Where it appears |
+| --- | --- |
+| Classes, composition, and vectors | Patients, visits, services, and BPM readings |
+| Dynamic memory | Employee data stored in dynamically allocated arrays and objects |
+| Inheritance and polymorphism | Employee and equipment hierarchies |
+| Operator overloading | Patient output, patient age increment, and sorting comparisons |
+| Recursion | Equipment depreciation schedule generation |
+| Templates | Storage units and reusable client helpers |
+| Exceptions | Duplicate IDs, invalid dates, and negative values |
+| File I/O | Startup data loading and patient report export |
 
-Visual Studio (Windows)
-- Open the repository folder in Visual Studio (File → Open → Folder). The included CMakeLists.txt provides presets for Ninja and MSVC. After configuration, build and run from the IDE.
+## Run in VS Code (Recommended)
 
-What to expect when you run it
-- A console menu drives adding/listing patients and appointments, importing demo patient data, running reports (including equipment depreciation), and saving state to text files.
-- The program ships with small sample data files in data/ (copied next to the executable at build time).
+### One-time setup
 
-C++ Concepts Demonstrated (portfolio-focused)
-This section is intentionally explicit so reviewers and recruiters can quickly see what skills the project highlights.
+Install the following on Windows:
 
-- Modern build & tooling
-  - CMake-based build with presets for reproducible configuration and CI-friendly commands.
-- Modularity & project structure
-  - Clear separation between the interactive layer (menu & CLI), domain model (Patient, Visit, Employee, Equipment), and persistence layer (file load/save).
-- Classes, encapsulation, and composition
-  - Domain objects model real entities with constructors, accessors, and small, testable member functions.
-- Ownership & resource management (RAII)
-  - Files, streams, and heap-allocated resources are managed with deterministic cleanup patterns.
-- Smart pointers & value semantics
-  - std::unique_ptr and std::shared_ptr used where ownership and shared lifetimes are appropriate; move semantics used to avoid unnecessary copies.
-- Polymorphism & inheritance
-  - Employee and Equipment hierarchies expose abstract interfaces and virtual functions for extendable behavior (e.g., depreciation calculation).
-- Templates and type-safe containers
-  - Generic storage-unit templates enable compile-time type routing and safer inventories.
-- STL & algorithms
-  - std::vector, std::map, and standard algorithms keep the code concise and expressive.
-- Error handling & exceptions
-  - Validation and error conditions use exceptions with clear messages and safe cleanup.
-- File I/O & simple serialization
-  - Text-based persistence format for records; import/export utilities decoupled from domain logic.
-- Test-friendly design
-  - Core logic is written to be testable via small functions; unit tests (CTest) demonstrate behavior for key components.
+1. **Visual Studio 2022 Community** with the **Desktop development with C++** workload. This supplies the MSVC compiler, CMake, and Ninja used by the project.
+2. **Visual Studio Code** with the recommended extensions when VS Code prompts you:
+   - Microsoft C/C++
+   - Microsoft CMake Tools
 
-Project structure (high level)
-- src/        — source files and implementation
-- include/    — public headers (if used)
-- data/       — example data files used by the program (copied into build output)
-- tests/      — CTest-based unit tests (e.g., tests/CoreTests.cpp)
-- docs/       — lab instructions and manual test checklist
+### First run
 
-Example file references (for reviewers)
-- Main program entry: [C:/Users/cclee/OneDrive/Coding Projects/healthcare-management/src/Main.cpp]
-- Core domain code: [C:/Users/cclee/OneDrive/Coding Projects/healthcare-management/src/Patient.cpp] and corresponding headers
-- Tests: [C:/Users/cclee/OneDrive/Coding Projects/healthcare-management/tests/CoreTests.cpp]
-- Lab instructions (original assignment documents): <C:/Users/cclee/OneDrive - Liberty University/LU Spring 2026/CSCN 112/Lab Instructions>
+1. Open this repository's folder in VS Code.
+2. Press `Ctrl+Shift+P`, run **Developer: Reload Window**, and wait for CMake Tools to configure the project.
+3. If VS Code asks for a configure preset, choose **`ninja-debug`**.
+4. Press `F5`.
+5. If VS Code asks for a launch configuration, choose **Run Healthcare Management**.
+6. The application opens in VS Code's integrated terminal. Enter `4` at the main menu to exit.
 
-Lab mapping (high level)
-- The codebase grew incrementally across eight labs; expect the commit history or the docs/manual-test-checklist.md to show which labs introduced each feature (e.g., patient model, visits, inheritance, templates, persistence).
+For future runs, open the folder and press `F5`. VS Code remembers the selected project configuration.
 
-How to run (short platform notes)
-- Windows (recommended development flow): Use Visual Studio or Developer PowerShell and the provided CMake presets. Example (PowerShell):
-  cmake --preset ninja-debug
-  cmake --build --preset ninja-debug
-  .\build\ninja-debug\healthcare_management.exe
+> Do not choose **C/C++: cl.exe build and debug active file**. That generic option tries to compile only the currently open `.cpp` file, while this is a multi-file CMake project.
 
-- macOS / Linux: Use the CMake recommended flow above or the single-command g++ example for quick testing.
+### If VS Code shows a CMake error
 
-Notes for reviewers
-- Look for clear ownership semantics (where unique_ptr is used), concise functions, and single-responsibility classes.
-- See tests/ for small, focused checks that demonstrate expected behavior.
+1. Confirm Visual Studio's **Desktop development with C++** workload is installed.
+2. Run **Developer: Reload Window** from the Command Palette.
+3. Wait for CMake Tools to configure again, then press `F5` and select **Run Healthcare Management**.
 
-Contributing
-- Suggestions and PRs are welcome. Please open issues for proposed changes and keep PRs focused and incremental.
+This repository's workspace settings automatically load Visual Studio's developer environment, allowing CMake Tools to find MSVC and Ninja without manually opening a Developer Command Prompt.
 
-License
-- Released under the MIT License. See [LICENSE](LICENSE) for details.
+## Run from a Terminal
 
-Contact
-- [Your Name] — link to your GitHub profile or email (add preferred contact information here).
+Open **Developer PowerShell for VS 2022** in the repository folder, then run:
 
----
+```powershell
+cmake --preset ninja-debug
+cmake --build --preset ninja-debug
+ctest --preset ninja-debug --output-on-failure
+.\build\ninja-debug\healthcare_management.exe
+```
 
-If you want any of the following adjustments, tell me and I will update and recommit:
-- Add explicit C++20 notes (current README recommends C++17)
-- Add direct links to additional source files or refactor the "Example file references" into relative repository links
-- Shorten the README further for a recruiter-friendly one-page view
+For the Visual Studio generator instead of Ninja, use the `vs2022-debug` preset:
 
+```powershell
+cmake --preset vs2022-debug
+cmake --build --preset vs2022-debug
+ctest --preset vs2022-debug --output-on-failure
+.\build\vs2022-debug\Debug\healthcare_management.exe
+```
+
+The build automatically copies the included fictional `.txt` data files beside the executable. To import a sample patient, choose **Read patient information from file** and enter a filename such as `Demo Patient Aurora` without the `.txt` extension.
+
+## Project Structure
+
+- `Main.cpp` contains the interactive menu flow and file loading.
+- Domain classes model patients, staff, services, visits, equipment, and storage units.
+- `tests/CoreTests.cpp` covers the core model behaviors through CTest.
+- `docs/manual-test-checklist.md` lists the complete interactive regression checklist.
+
+## License
+
+Released under the [MIT License](LICENSE).
