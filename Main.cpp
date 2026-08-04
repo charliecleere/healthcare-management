@@ -788,7 +788,6 @@ Patient buildPatientFromUserInput(const vector<Patient>& patients)
 			}
 		} while (temp_patient.addSingleBpm(temp_bpm_reading) == false);
 	}
-	cout << endl;
 	return temp_patient;
 }
 
@@ -1074,7 +1073,6 @@ void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of
 
 		// Attach the completed visit to the selected patient.
 		patients[patient_index_to_add_visit_to].addVisit(temp_visit);
-		cout << endl;
 	}
 	else
 		cout << "Patient ID not found." << endl;
