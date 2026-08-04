@@ -84,7 +84,10 @@ int getAndSearchForEquipmentId(const vector<Equipment*>& equipment, const std::s
 
 int calculateCenteredTextX(const std::string& s);
 
-void waitForEnter();
+// Clear the visible terminal before displaying the next workflow screen.
+void clearScreen();
+
+void waitForEnter(bool clear_after = true);
 
 template <typename T>
 void updateStorageUnitInformation(T& storage_unit);
@@ -375,7 +378,7 @@ int main()
 	else
 	{
 		cout << endl;
-		waitForEnter();
+		waitForEnter(false);
 	}
 
 	return 0;
@@ -542,6 +545,7 @@ int printMainMenu()
 		cin >> choice;
 		cout << endl;
 	}
+	clearScreen();
 	return choice;
 }
 
@@ -576,6 +580,7 @@ int printPatientMenu()
 		cin >> choice;
 		cout << endl;
 	}
+	clearScreen();
 	return choice;
 }
 
@@ -603,6 +608,7 @@ int printEmployeeMenu()
 		cin >> choice;
 		cout << endl;
 	}
+	clearScreen();
 	return choice;
 }
 
@@ -634,6 +640,7 @@ int printEquipmentMenu()
 		cin >> choice;
 		cout << endl;
 	}
+	clearScreen();
 	return choice;
 }
 
@@ -1358,13 +1365,20 @@ int calculateCenteredTextX(const std::string& s)
 	return SCREEN_WIDTH / 2 + static_cast<int>(s.size()) / 2;
 }
 
-void waitForEnter()
+void clearScreen()
+{
+	cout << "\x1B[2J\x1B[H" << flush;
+}
+
+void waitForEnter(bool clear_after)
 {
 	if (cin.fail())
 		cin.clear();
 	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	cout << endl << "Press Enter to continue...";
 	cin.get();
+	if (clear_after)
+		clearScreen();
 }
 
 template <typename Value, typename T>
@@ -1466,7 +1480,10 @@ int promptForStorageUnitType()
 		cout << "Enter 1 for the mobility storage unit, 2 for the monitoring storage unit, and 0 to exit: ";
 		cin >> num;
 		if (!cin.fail() && num >= 0 && num <= 2)
+		{
+			clearScreen();
 			return num;
+		}
 
 		cout << "Invalid selection. Please enter 0, 1, or 2." << endl;
 		cin.clear();
