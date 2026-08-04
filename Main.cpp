@@ -175,7 +175,7 @@ int main()
 					case 1: // Add a patient manually.
 						if (patients.size() >= MAX_NUM_OF_PATIENTS)
 						{
-							cout << "Health Care Options, Inc. is not accepting anymore new patients at this time." << endl << endl;
+							cout << "Health Care Options, Inc. is not accepting anymore new patients at this time." << endl;
 						}
 						else
 						{
@@ -185,7 +185,7 @@ int main()
 					case 2: // Import a patient from a file.
 						if (patients.size() >= MAX_NUM_OF_PATIENTS)
 						{
-							cout << "Health Care Options, Inc. is not accepting anymore new patients at this time." << endl << endl;
+							cout << "Health Care Options, Inc. is not accepting anymore new patients at this time." << endl;
 						}
 						else
 						{
@@ -237,7 +237,7 @@ int main()
 
 						output_file.close();
 
-						cout << endl << "The patient information was successfully saved to a file." << endl << endl;
+						cout << endl << "The patient information was successfully saved to a file." << endl;
 						break;
 					case 9: // Return to the main menu.
 						break;
@@ -624,9 +624,9 @@ int printEquipmentMenu()
 	cout << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 	cout << "1. Print equipment list to screen" << endl;
 	cout << "2. Produce depreciation schedule for equipment" << endl;
-	cout << "3. Update storage unit information." << endl;
-	cout << "4. Add equipment to storage unit." << endl;
-	cout << "5. View storage unit information." << endl;
+	cout << "3. Update storage unit information" << endl;
+	cout << "4. Add equipment to storage unit" << endl;
+	cout << "5. View storage unit information" << endl;
 	cout << "6. Return to main menu" << endl;
 	cout << setfill('-') << setw(64) << "" << setfill(' ') << endl;
 	cout << "Please enter your choice: ";
@@ -851,7 +851,7 @@ Patient readPatientFromFile(const vector<Patient>& patients)
 	while (input_file >> temp_bpm_reading)
 		temp_patient.addSingleBpm(temp_bpm_reading);
 
-	cout << endl << "Patient data loaded successfully." << endl << endl;
+	cout << endl << "Patient data loaded successfully." << endl;
 
 	input_file.close();
 
@@ -897,13 +897,13 @@ void deleteExistingPatient(vector<Patient>& patients)
 		if (toupper(confirm_removal_choice) == 'Y')
 		{
 			patients.erase(patients.begin() + patient_index_to_remove);
-			cout << endl << "Patient was successfully deleted." << endl << endl;
+			cout << endl << "Patient was successfully deleted." << endl;
 		}
 		else
-			cout << endl << "The operation to delete this patient has been cancelled." << endl << endl;
+			cout << endl << "The operation to delete this patient has been cancelled." << endl;
 	}
 	else
-		cout << endl << "Patient ID not found." << endl << endl;
+		cout << endl << "Patient ID not found." << endl;
 }
 
 void showPatientList(const vector<Patient>& patients)
@@ -1077,7 +1077,7 @@ void createVisitForPatient(vector<Patient>& patients, Nurse** nurses, int num_of
 		cout << endl;
 	}
 	else
-		cout << "Patient ID not found." << endl << endl;
+		cout << "Patient ID not found." << endl;
 }
 
 // Return the index of a matching object ID, or -1 when absent.
@@ -1201,11 +1201,11 @@ void assignCaseManagerToPatient(vector<Patient>& patients, CaseManager** case_ma
 				patients[patient_index_to_assign_case_mgr_to].setCaseManager(*case_managers[case_mgr_index_to_assign_to_patient]);
 			}
 			else
-				cout << endl << "The ID entered was not found in the system. Please try again." << endl << endl;
+				cout << endl << "The ID entered was not found in the system. Please try again." << endl;
 		}
 	}
 	else
-		cout << endl << "Patient ID not found." << endl << endl;
+		cout << endl << "Patient ID not found." << endl;
 }
 
 void incrementPatientAge(vector<Patient>& patients)
@@ -1248,15 +1248,15 @@ void incrementPatientAge(vector<Patient>& patients)
 		if (toupper(confirm_removal_choice) == 'Y')
 		{
 			patients[patient_index_to_add_age_to]++;
-			cout << endl << "Patient's age was successfully incremented." << endl << endl;
+			cout << endl << "Patient's age was successfully incremented." << endl;
 			cout << "This is the patient's updated information:" << endl << endl;
 			cout << patients[patient_index_to_add_age_to];
 		}
 		else
-			cout << endl << "The operation to increment this patient's age has been cancelled." << endl << endl;
+			cout << endl << "The operation to increment this patient's age has been cancelled." << endl;
 	}
 	else
-		cout << endl << "Patient ID not found." << endl << endl;
+		cout << endl << "Patient ID not found." << endl;
 }
 
 void sortPatientById(vector<Patient>& patients)
@@ -1375,7 +1375,7 @@ void waitForEnter(bool clear_after)
 	if (cin.fail())
 		cin.clear();
 	cin.ignore(numeric_limits<streamsize>::max(), '\n');
-	cout << endl << "Press Enter to continue...";
+	cout << '\n' << "Press Enter to continue...";
 	cin.get();
 	if (clear_after)
 		clearScreen();
@@ -1464,7 +1464,7 @@ void updateStorageUnitInformation(T& storage_unit)
 	storage_unit.setAutoRenewal(promptForYesNo("Does the rental have auto-renewal? (Y or N): ") == 'Y');
 	storage_unit.setHumidityControlled(promptForYesNo("Is the storage unit humidity-controlled? (Y or N): ") == 'Y');
 
-	cout << endl << endl << "Storage unit information updated successfully." << endl << endl;
+	cout << endl << "Storage unit information updated successfully." << endl;
 
 	cout << "Below is the updated information for this storage unit:" << endl << endl;
 
