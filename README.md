@@ -2,7 +2,7 @@
 
 A C++ console application that models patient records, home health employees, visits, durable medical equipment, depreciation, and typed storage-unit inventories for the fictional Health Care Options (HCO) organization.
 
-This project began as a CSCN 112 course project and was independently completed, tested, and polished afterward as a public C++ foundations portfolio project.
+This project began as a university C++ programming course project and was independently completed, tested, and polished afterward as a public C++ foundations portfolio project.
 
 > This is a programming simulation, not clinical software. All included people and records are fictional demo data.
 
