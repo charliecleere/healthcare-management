@@ -122,7 +122,19 @@ ctest --preset ninja-debug --output-on-failure
 
 A Visual Studio generator preset (`vs2022-debug`) is also available in [`CMakePresets.json`](CMakePresets.json).
 
-The build copies demo `.txt` data files beside the executable. To import a sample patient, choose **Read patient information from file** and enter `Demo Patient Aurora` (without the `.txt` extension).
+The build copies demo `.txt` data files beside the executable.
+
+## Sample Workflow
+
+After launching the app, try this short path to see the main features:
+
+1. **Import a demo patient** — Main menu `1` → `2` (Read patient information from file) → enter `Demo Patient Aurora` (no `.txt` extension).
+2. **View the patient report** — `7` (Print patient report to screen) to see demographics, BPM statistics, visits, and case-manager assignment.
+3. **View employee data** — `9` to return to the main menu, then `2` → `1` to print the nurse, aide, and case-manager report loaded at startup.
+4. **Run a depreciation schedule** — Main menu `3` → `2` → enter equipment ID `2501` for straight-line monitor depreciation, or `1001` for double-declining-balance mobility depreciation.
+5. **Exit** — Return to the main menu (`6` from Equipment, or `2` from Employee) and enter `4`.
+
+For a full interactive regression pass, see [`docs/manual-test-checklist.md`](docs/manual-test-checklist.md).
 
 ## Project Structure
 
