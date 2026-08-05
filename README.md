@@ -6,63 +6,112 @@ This project began as a CSCN 112 course project and was independently completed,
 
 > This is a programming simulation, not clinical software. All included people and records are fictional demo data.
 
+![C++ CI](https://github.com/charliecleere/healthcare-management/actions/workflows/ci.yml/badge.svg)
+
 ## Highlights
 
-- Patient records with BPM statistics, visit history, case-manager assignment, reporting, and file import/export
-- Employee inheritance hierarchy for nurses, aides, and case managers
-- Equipment polymorphism with recursive straight-line and double-declining-balance depreciation reports
-- Template-based storage units that route monitor and mobility equipment into type-safe inventories
-- Exception-driven validation for duplicate visit IDs, invalid dates, and negative storage-unit values
-- Reproducible CMake build, CTest coverage, and Windows GitHub Actions CI
+- **Patient lifecycle** — CRUD, BPM analytics, visit history, case-manager assignment, and file import/export
+- **Staff modeling** — Nurse, aide, and case-manager types built on a shared employee base class
+- **Equipment reporting** — Polymorphic depreciation schedules (straight-line and double-declining-balance)
+- **Inventory management** — Type-safe template storage units with input validation
+- **Engineering quality** — CMake presets, automated unit tests (CTest), MSVC `/W4` warnings, and GitHub Actions CI
 
 ## C++ Concepts Demonstrated
 
-| Concept | Where it appears |
-| --- | --- |
-| Classes, composition, and vectors | Patients, visits, services, and BPM readings |
-| Dynamic memory | Employee data stored in dynamically allocated arrays and objects |
-| Inheritance and polymorphism | Employee and equipment hierarchies |
-| Operator overloading | Patient output, patient age increment, and sorting comparisons |
-| Recursion | Equipment depreciation schedule generation |
-| Templates | Storage units and reusable client helpers |
-| Exceptions | Duplicate IDs, invalid dates, and negative values |
-| File I/O | Startup data loading and patient report export |
+Built in C++17 as a modular static library (`hco_core`) linked by the application and test targets.
 
-## Run in VS Code (Recommended)
+### Classes, composition, and STL containers
 
-### One-time setup
+Models a home-health domain by composing small, focused types rather than monolithic structs.
 
-Install the following on Windows:
+- `Patient` composes `Visit`, `CaseManager`, and `std::vector` collections for BPM readings and visit history ([`Patient.h`](Patient.h))
+- `Visit` composes `Nurse`, `Aide`, and a `std::vector<Service>` for per-visit care records ([`Visit.h`](Visit.h))
+- `Date` encapsulates calendar logic shared across visits, equipment, and storage units ([`Date.h`](Date.h))
 
-1. **Visual Studio 2022 Community** with the **Desktop development with C++** workload. This supplies the MSVC compiler, CMake, and Ninja used by the project.
-2. **Visual Studio Code** with the recommended extensions when VS Code prompts you:
-   - Microsoft C/C++
-   - Microsoft CMake Tools
+### Dynamic memory and the Rule of Three
 
-### First run
+Demonstrates explicit ownership of heap-allocated resources in a pre-smart-pointer style appropriate for foundational C++ coursework.
 
-1. Open this repository's folder in VS Code.
-2. Press `Ctrl+Shift+P`, run **Developer: Reload Window**, and wait for CMake Tools to configure the project.
-3. If VS Code asks for a configure preset, choose **`ninja-debug`**.
-4. Press `F5`.
-5. If VS Code asks for a launch configuration, choose **Run Healthcare Management**.
-6. The application opens in VS Code's integrated terminal. Enter `4` at the main menu to exit.
+- `Employee` stores identity fields on the heap with a copy constructor, destructor, and assignment operator ([`Employee.h`](Employee.h), [`Employee.cpp`](Employee.cpp))
+- `Main.cpp` manages dynamically allocated employee arrays for nurses, aides, and case managers
 
-For future runs, open the folder and press `F5`. VS Code remembers the selected project configuration.
+### Inheritance and polymorphism
 
-> Do not choose **C/C++: cl.exe build and debug active file**. That generic option tries to compile only the currently open `.cpp` file, while this is a multi-file CMake project.
+Uses virtual methods so shared reporting logic operates on base pointers without knowing the concrete type.
 
-### If VS Code shows a CMake error
+- `Nurse`, `Aide`, and `CaseManager` extend `Employee` with role-specific fields and reports
+- `MonitorEquipment` and `MobilityEquipment` override virtual `depreciate()` and `printDetails()` on the `Equipment` base ([`Equipment.h`](Equipment.h))
 
-1. Confirm Visual Studio's **Desktop development with C++** workload is installed.
-2. Run **Developer: Reload Window** from the Command Palette.
-3. Wait for CMake Tools to configure again, then press `F5` and select **Run Healthcare Management**.
+### Operator overloading
 
-This repository's workspace settings automatically load Visual Studio's developer environment, allowing CMake Tools to find MSVC and Ninja without manually opening a Developer Command Prompt.
+Custom operators keep console output and sorting logic close to the domain types.
 
-## Run from a Terminal
+- `Patient`: stream output (`operator<<`), alphabetical sort (`operator<`), and age increment (prefix/postfix `operator++`) ([`Patient.h`](Patient.h))
+- `Date`: stream output for formatted display ([`Date.h`](Date.h))
+- `Equipment`: less-than comparison for sorted inventory reports ([`Equipment.h`](Equipment.h))
 
-Open **Developer PowerShell for VS 2022** in the repository folder, then run:
+### Recursion
+
+Depreciation schedules are generated recursively, one period at a time, until the salvage-value floor is reached.
+
+- Straight-line depreciation in `MonitorEquipment` ([`MonitorEquipment.h`](MonitorEquipment.h))
+- Double-declining-balance depreciation in `MobilityEquipment` ([`MobilityEquipment.h`](MobilityEquipment.h))
+
+### Templates
+
+Generic code eliminates duplication while keeping type-safe inventories for each equipment category.
+
+- `StorageUnit<T>` provides shared rental, validation, sorting, and reporting behavior for any equipment type ([`StorageUnit.h`](StorageUnit.h))
+- Templated employee loaders and sorters in [`Main.cpp`](Main.cpp)
+
+### Exceptions and validation
+
+Custom exception types enforce business rules at the point of invalid input.
+
+- `DuplicateIdException`, `InvalidDateException`, and `NegativeNumberException` with descriptive `what()` messages
+- Leap-year-aware date parsing and duplicate visit-ID detection
+- Negative-dimension and negative-cost guards on storage units
+
+### File I/O and console UX
+
+A menu-driven workflow loads startup data from `.txt` files and exports patient reports on demand.
+
+- Startup loading for services, employees, and equipment in [`Main.cpp`](Main.cpp)
+- Patient report export and interactive input validation across all menus
+
+## Tech Stack and Quality
+
+- **Language:** C++17 (extensions off)
+- **Build:** CMake 3.20+ with presets (`ninja-debug`, `vs2022-debug`) — see [`CMakeLists.txt`](CMakeLists.txt), [`CMakePresets.json`](CMakePresets.json)
+- **Tests:** CTest suite in [`tests/CoreTests.cpp`](tests/CoreTests.cpp) covering date validation, visits, storage units, depreciation, and exceptions
+- **CI:** GitHub Actions on `windows-latest` ([`.github/workflows/ci.yml`](.github/workflows/ci.yml))
+
+## Architecture at a Glance
+
+- **Application layer** — [`Main.cpp`](Main.cpp): interactive menus, file loading, search/sort helpers, and formatted reports
+- **Domain layer** — `Patient`, `Visit`, `Service`, `Date`, employee hierarchy (`Employee` → `Nurse` / `Aide` / `CaseManager`), equipment hierarchy (`Equipment` → `MonitorEquipment` / `MobilityEquipment`), and `StorageUnit<T>`
+- **Infrastructure** — `hco_core` static library, post-build copy of demo `.txt` data files, and CTest harness
+
+## Quick Start
+
+**Prerequisites:** Windows, Visual Studio 2022 with the **Desktop development with C++** workload, and VS Code with the **C/C++** and **CMake Tools** extensions (see [`.vscode/extensions.json`](.vscode/extensions.json)).
+
+**Run in VS Code (recommended):**
+
+1. Open this repository folder in VS Code.
+2. When prompted, select the **`ninja-debug`** CMake preset.
+3. Press **`F5`** and choose **Run Healthcare Management**.
+4. Enter **`4`** at the main menu to exit.
+
+For future runs, open the folder and press **`F5`**.
+
+> If CMake fails to configure, confirm the C++ workload is installed, then run **Developer: Reload Window** from the Command Palette. Workspace settings load the Visual Studio developer environment automatically — no Developer Command Prompt required.
+
+> Do not choose **C/C++: cl.exe build and debug active file**; that option compiles only the active `.cpp` file, not this multi-file CMake project.
+
+### Run from a Terminal
+
+Open **Developer PowerShell for VS 2022** in the repository folder:
 
 ```powershell
 cmake --preset ninja-debug
@@ -71,23 +120,17 @@ ctest --preset ninja-debug --output-on-failure
 .\build\ninja-debug\healthcare_management.exe
 ```
 
-For the Visual Studio generator instead of Ninja, use the `vs2022-debug` preset:
+A Visual Studio generator preset (`vs2022-debug`) is also available in [`CMakePresets.json`](CMakePresets.json).
 
-```powershell
-cmake --preset vs2022-debug
-cmake --build --preset vs2022-debug
-ctest --preset vs2022-debug --output-on-failure
-.\build\vs2022-debug\Debug\healthcare_management.exe
-```
-
-The build automatically copies the included fictional `.txt` data files beside the executable. To import a sample patient, choose **Read patient information from file** and enter a filename such as `Demo Patient Aurora` without the `.txt` extension.
+The build copies demo `.txt` data files beside the executable. To import a sample patient, choose **Read patient information from file** and enter `Demo Patient Aurora` (without the `.txt` extension).
 
 ## Project Structure
 
-- `Main.cpp` contains the interactive menu flow and file loading.
-- Domain classes model patients, staff, services, visits, equipment, and storage units.
-- `tests/CoreTests.cpp` covers the core model behaviors through CTest.
-- `docs/manual-test-checklist.md` lists the complete interactive regression checklist.
+- [`Main.cpp`](Main.cpp) — interactive menu flow and file loading
+- Domain headers and sources — patients, staff, services, visits, equipment, and storage units
+- [`tests/CoreTests.cpp`](tests/CoreTests.cpp) — automated unit tests via CTest
+- [`CMakeLists.txt`](CMakeLists.txt) / [`CMakePresets.json`](CMakePresets.json) — build configuration and presets
+- [`docs/manual-test-checklist.md`](docs/manual-test-checklist.md) — interactive regression checklist
 
 ## License
 
