@@ -81,10 +81,12 @@ A menu-driven workflow loads startup data from `.txt` files and exports patient 
 
 ## Tech Stack and Quality
 
-- **Language:** C++17 (extensions off)
+- **Language:** C++17 (compiler extensions disabled for portability)
 - **Build:** CMake 3.20+ with presets (`ninja-debug`, `vs2022-debug`) — see [`CMakeLists.txt`](CMakeLists.txt), [`CMakePresets.json`](CMakePresets.json)
 - **Tests:** CTest suite in [`tests/CoreTests.cpp`](tests/CoreTests.cpp) covering date validation, visits, storage units, depreciation, and exceptions
-- **CI:** GitHub Actions on `windows-latest` ([`.github/workflows/ci.yml`](.github/workflows/ci.yml))
+- **CI:** GitHub Actions on `windows-latest` with Release builds (see [`.github/workflows/ci.yml`](.github/workflows/ci.yml))
+
+> **Note:** This project is configured and tested on Windows. While the CMake setup includes cross-platform compiler flags, other platforms (Linux, macOS) are not officially supported or tested.
 
 ## Architecture at a Glance
 
