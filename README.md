@@ -1,6 +1,6 @@
 # HCO Patient & Equipment Management
 
-A C++ console application that models patient records, home health employees, visits, durable medical equipment, depreciation, and typed storage-unit inventories for the fictional Health Care Options (HCO) organization.
+A C++ console application that manages patient records, home health employees, visits, durable medical equipment, depreciation, and typed storage-unit inventories for the fictional Health Care Options (HCO) organization.
 
 This project began as a university C++ programming course project and was independently completed, tested, and polished afterward as a public C++ foundations portfolio project.
 
@@ -22,11 +22,11 @@ Built in C++17 as a modular static library (`hco_core`) linked by the applicatio
 
 ### Classes, composition, and STL containers
 
-Models a home-health domain by composing small, focused types rather than monolithic structs.
+Builds a healthcare management system by combining small pieces of code, where each piece does one specific job, rather than using one large, complicated piece that does everything.
 
-- `Patient` composes `Visit`, `CaseManager`, and `std::vector` collections for BPM readings and visit history ([`Patient.h`](Patient.h))
-- `Visit` composes `Nurse`, `Aide`, and a `std::vector<Service>` for per-visit care records ([`Visit.h`](Visit.h))
-- `Date` encapsulates calendar logic shared across visits, equipment, and storage units ([`Date.h`](Date.h))
+- `Patient` contains `Visit`, `CaseManager`, and `std::vector` collections for BPM readings and visit history ([`Patient.h`](Patient.h))
+- `Visit` contains `Nurse`, `Aide`, and a `std::vector<Service>` for per-visit care records ([`Visit.h`](Visit.h))
+- `Date` provides shared calendar functionality for visits, equipment, and storage units ([`Date.h`](Date.h))
 
 ### Dynamic memory and the Rule of Three
 
